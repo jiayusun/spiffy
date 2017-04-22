@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
  
-PROJECT(testFile)
+PROJECT(milxFileTest)
  
 FIND_PACKAGE(VTK REQUIRED)
 INCLUDE(${VTK_USE_FILE})
@@ -11,5 +11,5 @@ INCLUDE(${ITK_USE_FILE})
 INCLUDE_DIRECTORIES(${SMILI_SOURCE_DIR}/include ${SMILI_SOURCE_DIR}/include/Qt ${SMILI_SOURCE_DIR}/include/vtk-ext ${SMILI_SOURCE_DIR}/include/itkVTKGlue)
 link_directories(${SMILI_BINARY_DIR}/lib)
  
-ADD_EXECUTABLE(testFile testFile.cxx)
-TARGET_LINK_LIBRARIES(testFile ${ITK_LIBRARIES} ${VTK_LIBRARIES})
+ADD_EXECUTABLE(milxFileTest milxFileTest.cxx)
+TARGET_LINK_LIBRARIES(milxFileTest ${ITK_LIBRARIES} ${VTK_LIBRARIES})
