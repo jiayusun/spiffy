@@ -202,6 +202,10 @@ public:
 
   Returns an empty list if an error was encountered.
   */
+
+  template<class TImage>
+  static vtkSmartPointer<vtkImageData> ConvertITKImageToVTKImage(itk::SmartPointer<TImage> img);
+
   static std::vector<std::string> GetDICOMSeriesUIDs(const std::string directoryPath, bool recursive = false);
   /*!
   \fn File::GetDICOMSeriesFilenames(const std::string directoryPath, const std::string seriesName)
@@ -272,6 +276,7 @@ public:
   */
   template<class TImage>
   static bool SaveImage(const std::string filename, vtkSmartPointer<vtkImageData> &data);
+
   #endif
 #endif
 
@@ -1002,6 +1007,28 @@ itk::SmartPointer< itk::Transform<TType> > File::OpenTransform(std::string filen
 
   return static_cast< itk::Transform<TType> *>( (*(affineReader->GetTransformList()->begin())).GetPointer() );
 }
+
+template<class TImage>
+vtkSmartPointer<vtkImageData> File::ConvertITKImageToVTKImage(itk::SmartPointer<TImage> img)
+{
+	typedef itk::ImageToVTKImageFilter<TImage> ConvertImageType;
+
+	typename ConvertImageType::Pointer convertFilter = ConvertImageType::New();
+	convertFilter->SetInput(img);
+	convertFilter->AddObserver(itk::ProgressEvent(), ProgressUpdates);
+	try
+	{
+		convertFilter->Update();
+	}
+	catch (itk::ExceptionObject & ex)
+	{
+		PrintError("Failed Converting ITK Image to VTK Image");
+		PrintError(ex.GetDescription());
+	}
+
+	return convertFilter->GetOutput();
+}
+
 #endif
 
 } //end namespace milx

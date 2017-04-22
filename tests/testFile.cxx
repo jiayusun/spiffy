@@ -21,9 +21,19 @@ int main(int argc, char *argv[])
 		milx::PrintError("Could not open file.");
 		return EXIT_FAILURE;
 	}
+	vtkSmartPointer<vtkImageData> imageVTK = milx::File::ConvertITKImageToVTKImage(image);
+
+	std::string savedFileName = argv[2];
+	if (!milx::File::SaveImage<VisualizingImageType>(savedFileName,imageVTK))
+	{ 
+		milx::PrintError("Could not save file.");
+		return EXIT_FAILURE;
+	}
 
 	//milxFileTest save the image to another name argv[2]
 	//repeat for milxQtWindow create a test : show a window.
 
 	return EXIT_SUCCESS;
 }
+
+
