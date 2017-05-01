@@ -5,5 +5,6 @@ add_subdirectory (milxFileTest)
 IF(BUILD_MILXQT)
   set(CMAKE_AUTOMOC ON)
   add_subdirectory (milxQtWindowTest)
+  add_subdirectory (milxQtRenderWindowTest)
 
 ENDIF(BUILD_MILXQT)

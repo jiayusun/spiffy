@@ -17,11 +17,23 @@ set(SMILI_SOURCES
     milxFile.cxx
    )
 ENDIF(USE_ITK)
-
+IF(USE_VTK)
+set(SMILI_SOURCES
+    ${SMILI_SOURCES}
+    utils/milxColourMap.cxx
+   )
+ENDIF(USE_VTK)
 
 # Add Headers into List
 file(GLOB SMILI_HEADERS ${LIBRARY_INCLUDE_PATH}/*.h)
 
+IF(USE_VTK)
+  set(SMILI_HEADERS
+    ${SMILI_HEADERS}
+    ${SMILI_INC}/utils/milxLUT.h
+    ${SMILI_INC}/utils/milxColourMap.h
+    )
+ENDIF(USE_VTK)
 
 # 64-bit Build?
 #set (SMILI_64 ON) #True
