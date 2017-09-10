@@ -107,6 +107,9 @@ ENDIF(APPLE)
 # cause another cmake executable to run.
 add_subdirectory (src)
 
+IF(BUILD_APPLICATIONS)
+    add_subdirectory (apps)
+ENDIF(BUILD_APPLICATIONS)
 
 IF(BUILD_TESTS)
     add_subdirectory (tests)

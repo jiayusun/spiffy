@@ -6,14 +6,233 @@
    <rect>
     <x>0</x>
     <y>0</y>
+<<<<<<< HEAD
+    <width>684</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+=======
     <width>372</width>
     <height>405</height>
    </rect>
   </property>
+>>>>>>> a7375c91df5befed686c74c890be37bc10595e17
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+<<<<<<< HEAD
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <widget class="QPushButton" name="pushButton_8">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>130</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Crosshair&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../smili.qrc">
+      <normaloff>:/resources/toolbar/intensity.png</normaloff>:/resources/toolbar/intensity.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_9">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>30</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Change to four pane viewer&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../smili.qrc">
+      <normaloff>:/resources/toolbar/screenshot.png</normaloff>:/resources/toolbar/screenshot.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_11">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>80</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../smili.qrc">
+      <normaloff>:/resources/toolbar/crosshairs_2D.png</normaloff>:/resources/toolbar/crosshairs_2D.png</iconset>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBox">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>0</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>View: Coronal</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>View: Axial</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>View: Sagittal</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QPushButton" name="pushButton_10">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>510</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Crosshair&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QVTKWidget" name="qvtkWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>591</width>
+      <height>561</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_12">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>180</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Crosshair&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="radioButton">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>230</y>
+      <width>82</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Image</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="radioButton_2">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>250</y>
+      <width>82</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Lable Image</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="radioButton_3">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>270</y>
+      <width>82</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Blend Image</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>684</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen_2"/>
+    <addaction name="actionOpen"/>
+    <addaction name="actionSave_2"/>
+    <addaction name="actionRefresh_2"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionControl_2"/>
+    <addaction name="actionAbout_2"/>
+    <addaction name="actionConsole"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <action name="actionFile">
+=======
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
@@ -63,14 +282,36 @@
    <addaction name="actionAbout"/>
   </widget>
   <action name="actionCrosshair">
+>>>>>>> a7375c91df5befed686c74c890be37bc10595e17
    <property name="enabled">
     <bool>true</bool>
    </property>
    <property name="text">
+<<<<<<< HEAD
+    <string>File</string>
+   </property>
+   <property name="toolTip">
+    <string>File</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="icon">
+    <iconset resource="../smili.qrc">
+     <normaloff>:/resources/toolbar/open.png</normaloff>:/resources/toolbar/open.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open Label Image</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
+=======
     <string>Crosshair</string>
    </property>
    <property name="toolTip">
     <string>Crosshair</string>
+>>>>>>> a7375c91df5befed686c74c890be37bc10595e17
    </property>
   </action>
   <action name="actionRefresh">
@@ -83,6 +324,64 @@
     <string>Intensity</string>
    </property>
   </action>
+<<<<<<< HEAD
+  <action name="actionControl">
+   <property name="text">
+    <string>Control</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionconsole">
+   <property name="text">
+    <string>console</string>
+   </property>
+  </action>
+  <action name="actionOpen_2">
+   <property name="icon">
+    <iconset resource="../smili.qrc">
+     <normaloff>:/resources/toolbar/open.png</normaloff>:/resources/toolbar/open.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open Image</string>
+   </property>
+  </action>
+  <action name="actionSave_2">
+   <property name="icon">
+    <iconset resource="../smili.qrc">
+     <normaloff>:/resources/toolbar/save.png</normaloff>:/resources/toolbar/save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+  <action name="actionRefresh_2">
+   <property name="icon">
+    <iconset resource="../smili.qrc">
+     <normaloff>:/resources/toolbar/refresh.png</normaloff>:/resources/toolbar/refresh.png</iconset>
+   </property>
+   <property name="text">
+    <string>Refresh</string>
+   </property>
+  </action>
+  <action name="actionControl_2">
+   <property name="icon">
+    <iconset resource="../smili.qrc">
+     <normaloff>:/resources/toolbar/controls.png</normaloff>:/resources/toolbar/controls.png</iconset>
+   </property>
+   <property name="text">
+    <string>Control</string>
+   </property>
+  </action>
+  <action name="actionAbout_2">
+   <property name="icon">
+    <iconset resource="../smili.qrc">
+     <normaloff>:/resources/toolbar/help.png</normaloff>:/resources/toolbar/help.png</iconset>
+   </property>
+=======
   <action name="actionSaveScreen">
    <property name="text">
     <string>Save Screen</string>
@@ -94,11 +393,35 @@
    </property>
   </action>
   <action name="actionAbout">
+>>>>>>> a7375c91df5befed686c74c890be37bc10595e17
    <property name="text">
     <string>About</string>
    </property>
   </action>
+<<<<<<< HEAD
+  <action name="actionConsole">
+   <property name="icon">
+    <iconset resource="../smili.qrc">
+     <normaloff>:/resources/toolbar/console.png</normaloff>:/resources/toolbar/console.png</iconset>
+   </property>
+   <property name="text">
+    <string>Console</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QVTKWidget</class>
+   <extends>QWidget</extends>
+   <header>QVTKWidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../smili.qrc"/>
+ </resources>
+=======
  </widget>
  <resources/>
+>>>>>>> a7375c91df5befed686c74c890be37bc10595e17
  <connections/>
 </ui>
