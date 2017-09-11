@@ -19,11 +19,7 @@ ENDIF(VTK_QT_VERSION VERSION_GREATER "4")
 PROJECT(milx-Qt)
 
 # Add Sources
-<<<<<<< HEAD
 set(MILXQT_SOURCES milxQtConsole milxQtWindow milxQtRenderWindow milxQtImage)
-=======
-set(MILXQT_SOURCES milxQtConsole milxQtWindow milxQtRenderWindow)
->>>>>>> a7375c91df5befed686c74c890be37bc10595e17
 set(MILXQT_SOURCE_DIR ${PROJECT_SOURCE_DIR})
 set(MILXQT_BINARY_DIR ${PROJECT_BINARY_DIR})
 

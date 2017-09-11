@@ -87,9 +87,6 @@
         <file>resources/apps_doc/milxImageApp.html</file>
         <file>resources/apps_doc/milxModelApp.html</file>
         <file>resources/apps_doc/milxOverlay.html</file>
-<<<<<<< HEAD
 		<file>resources/style.qss</file>
-=======
->>>>>>> a7375c91df5befed686c74c890be37bc10595e17
     </qresource>
 </RCC>

@@ -41,6 +41,7 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 {
 	QMainWindow *mainWindow = qobject_cast<QMainWindow *>(theParent);
 	ui.setupUi(mainWindow);
+
 	for (int j = 0; j < 3; j++)
 	{
 		viewer[j] = vtkSmartPointer<vtkImageViewer3>::New();
@@ -53,7 +54,27 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	btnGroup->addButton(ui.radioButton_2, 1);
 	btnGroup->addButton(ui.radioButton_3, 2);
 	ui.radioButton->setChecked(true);
+//	ui.pushButton_10->setChecked(false);
+	QPoint pos = mainWindow->mapToGlobal(QPoint(0, 0));
+	mainWindow->move(pos.x() + 200, pos.y() + 100);
 	createConnections();
+	//
+	ui.toolBar->setAllowedAreas(Qt::NoToolBarArea);
+	ui.toolBar->setOrientation(Qt::Vertical);
+	ui.toolBar->move(mainWindow->pos().x()-120, mainWindow->pos().y());
+	ui.toolBar->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint);
+	ui.toolBar->adjustSize();
+	ui.toolBar->show();
+
+
+	///Setup Console
+	console = new milxQtConsole;
+	actionConsole = console->dockWidget()->toggleViewAction();
+	actionConsole->setIcon(QIcon(":/resources/toolbar/console.png"));
+	dockActions.append(actionConsole);
+	QObject::connect(console->dockWidget(), SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), console, SLOT(setDockDefaultArea(Qt::DockWidgetArea)));
+	mainWindow->addDockWidget(console->dockDefaultArea(), console->dockWidget());
+	actionConsole->setChecked(false);
 }
 
 milxQtImage::~milxQtImage()
@@ -85,7 +106,6 @@ void milxQtImage::generate(int i)
 	viewer[i]->SetInputData(imageData[i]);
 	//imageViewer->GetRenderWindow()->SetSize(500, 500);
 	//
-	setGeometry(QRect(0, 25, 590, 590));
 	milxQtRenderWindow::SetRenderer(viewer[i]->GetRenderer());
 	ui.qvtkWidget->SetRenderWindow(viewer[i]->GetRenderWindow());
 	viewer[i]->SetupInteractor(ui.qvtkWidget->GetRenderWindow()->GetInteractor());
@@ -208,20 +228,6 @@ void milxQtImage::blend()
 	
 }
 
-void milxQtImage::showSlideWidgetPressed()
-{
-	slide = new QWidget(this);
-	slide->setGeometry(-slide->width(), 0, slide->width(), slide->height());
-	slide->show();
-	// then a animation:
-	QPropertyAnimation *animation = new QPropertyAnimation(slide, "pos");
-	animation->setDuration(10000);
-	animation->setStartValue(slide->pos());
-	animation->setEndValue(QPoint(0, 0));
-
-	// to slide in call
-	animation->start();
-}
 
 void milxQtImage::open(int i)
 {
@@ -284,6 +290,9 @@ void milxQtImage::switchViewer()
 	
 }
 
+
+
+
 void milxQtImage::createConnections()
 {
 	QObject::connect(ui.comboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(changeView(QString)));
@@ -291,13 +300,13 @@ void milxQtImage::createConnections()
 	QObject::connect(ui.radioButton_2, SIGNAL(clicked()), this, SLOT(switchViewer()));
 	QObject::connect(ui.radioButton_3, SIGNAL(clicked()), this, SLOT(switchViewer()));
 	QObject::connect(ui.pushButton_12, SIGNAL(clicked()), this, SLOT(blend()));
-	QObject::connect(ui.pushButton_10, SIGNAL(clicked()), this, SLOT(showSlideWidgetPressed()));
 	QSignalMapper* mapper = new QSignalMapper;
 	mapper->setMapping(ui.actionOpen_2, 0);
 	mapper->setMapping(ui.actionOpen, 1);
 	QObject::connect(ui.actionOpen_2, SIGNAL(triggered()), mapper, SLOT(map()));
 	QObject::connect(ui.actionOpen, SIGNAL(triggered()), mapper, SLOT(map()));
 	QObject::connect(mapper, SIGNAL(mapped(int)), this, SLOT(open(int)));
+
 }
 
 
