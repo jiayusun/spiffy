@@ -31,6 +31,8 @@
 #include "vtkImageViewer3.h"
 #include "milxFile.h"
 #include "milxImage.h"
+#include <QDockWidget>
+#include <QComboBox>
 #include "milxGlobal.h"
 #include <sstream>
 #include "ui_spiffy.h"
@@ -57,24 +59,35 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 //	ui.pushButton_10->setChecked(false);
 	QPoint pos = mainWindow->mapToGlobal(QPoint(0, 0));
 	mainWindow->move(pos.x() + 200, pos.y() + 100);
-	createConnections();
-	//
-	ui.toolBar->setAllowedAreas(Qt::NoToolBarArea);
-	ui.toolBar->setOrientation(Qt::Vertical);
-	ui.toolBar->move(mainWindow->pos().x()-120, mainWindow->pos().y());
-	ui.toolBar->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint);
-	ui.toolBar->adjustSize();
-	ui.toolBar->show();
-
 
 	///Setup Console
 	console = new milxQtConsole;
 	actionConsole = console->dockWidget()->toggleViewAction();
 	actionConsole->setIcon(QIcon(":/resources/toolbar/console.png"));
+	ui.toolBar->addAction(actionConsole);
 	dockActions.append(actionConsole);
 	QObject::connect(console->dockWidget(), SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), console, SLOT(setDockDefaultArea(Qt::DockWidgetArea)));
 	mainWindow->addDockWidget(console->dockDefaultArea(), console->dockWidget());
-	actionConsole->setChecked(false);
+	console->show();
+
+	//
+	ui.toolBar->setAllowedAreas(Qt::NoToolBarArea);
+	ui.toolBar->setOrientation(Qt::Vertical);
+	ui.toolBar->move(mainWindow->pos().x() - 127, mainWindow->pos().y() + 40);
+	ui.toolBar->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint);
+	ui.toolBar->adjustSize();
+	ui.toolBar->show();
+
+	//
+	QWidgetAction *comboAction = new QWidgetAction(ui.menuBar);
+	QComboBox *comboBox = new QComboBox(ui.menuBar);
+	comboBox->addItem("View: Coronal");
+	comboBox->addItem("View: Axial");
+	comboBox->addItem("View: Sagittal");
+	comboAction->setDefaultWidget(comboBox);
+	ui.menuBar->addAction(comboAction);
+	QObject::connect(comboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(changeView(QString)));
+	createConnections();
 }
 
 milxQtImage::~milxQtImage()
@@ -295,17 +308,18 @@ void milxQtImage::switchViewer()
 
 void milxQtImage::createConnections()
 {
-	QObject::connect(ui.comboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(changeView(QString)));
+
 	QObject::connect(ui.radioButton, SIGNAL(clicked()), this, SLOT(switchViewer()));
 	QObject::connect(ui.radioButton_2, SIGNAL(clicked()), this, SLOT(switchViewer()));
 	QObject::connect(ui.radioButton_3, SIGNAL(clicked()), this, SLOT(switchViewer()));
-	QObject::connect(ui.pushButton_12, SIGNAL(clicked()), this, SLOT(blend()));
+	QObject::connect(ui.actionBlend, SIGNAL(triggered()), this, SLOT(blend()));
 	QSignalMapper* mapper = new QSignalMapper;
 	mapper->setMapping(ui.actionOpen_2, 0);
 	mapper->setMapping(ui.actionOpen, 1);
 	QObject::connect(ui.actionOpen_2, SIGNAL(triggered()), mapper, SLOT(map()));
 	QObject::connect(ui.actionOpen, SIGNAL(triggered()), mapper, SLOT(map()));
 	QObject::connect(mapper, SIGNAL(mapped(int)), this, SLOT(open(int)));
+	//connect(ui.actionConsole, SIGNAL(toggled(bool)), toolbaraction, SLOT(setChecked(bool)));
 
 }
 

@@ -94,9 +94,9 @@ protected:
 	vtkSmartPointer<vtkImageViewer3> viewer[3]; //!< VTK Viewer handler, Smart Pointer
 	vtkSmartPointer<vtkImageData> imageData[3];
 	bool timestamping; //!< Prefer showing timestamp?
-	QAction* actionConsole;
 	QList< QAction* > dockActions; //!< List of dock actions of dock widgets loaded succesfully.
 	QPointer<milxQtConsole> console; //!< console docked window
+	QAction* actionConsole; //!< toggle action for console
 	/*!
 	\fn milxQtMain::createConnections()
 	\brief Creates the signals and slots connections within the main window.

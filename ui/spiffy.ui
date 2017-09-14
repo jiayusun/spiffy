@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>684</width>
-    <height>600</height>
+    <width>612</width>
+    <height>654</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -26,96 +26,11 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <widget class="QPushButton" name="pushButton_8">
-    <property name="geometry">
-     <rect>
-      <x>590</x>
-      <y>130</y>
-      <width>41</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Crosshair&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset resource="../smili.qrc">
-      <normaloff>:/resources/toolbar/intensity.png</normaloff>:/resources/toolbar/intensity.png</iconset>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_9">
-    <property name="geometry">
-     <rect>
-      <x>590</x>
-      <y>30</y>
-      <width>41</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Change to four pane viewer&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset resource="../smili.qrc">
-      <normaloff>:/resources/toolbar/screenshot.png</normaloff>:/resources/toolbar/screenshot.png</iconset>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_11">
-    <property name="geometry">
-     <rect>
-      <x>590</x>
-      <y>80</y>
-      <width>41</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset resource="../smili.qrc">
-      <normaloff>:/resources/toolbar/crosshairs_2D.png</normaloff>:/resources/toolbar/crosshairs_2D.png</iconset>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="comboBox">
-    <property name="geometry">
-     <rect>
-      <x>590</x>
-      <y>0</y>
-      <width>91</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <item>
-     <property name="text">
-      <string>View: Coronal</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>View: Axial</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>View: Sagittal</string>
-     </property>
-    </item>
-   </widget>
    <widget class="QPushButton" name="pushButton_10">
     <property name="geometry">
      <rect>
-      <x>590</x>
-      <y>510</y>
+      <x>10</x>
+      <y>570</y>
       <width>41</width>
       <height>41</height>
      </rect>
@@ -130,34 +45,18 @@
    <widget class="QVTKWidget" name="qvtkWidget">
     <property name="geometry">
      <rect>
-      <x>0</x>
+      <x>10</x>
       <y>0</y>
       <width>591</width>
       <height>561</height>
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_12">
-    <property name="geometry">
-     <rect>
-      <x>590</x>
-      <y>180</y>
-      <width>41</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Crosshair&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
    <widget class="QRadioButton" name="radioButton">
     <property name="geometry">
      <rect>
-      <x>590</x>
-      <y>230</y>
+      <x>300</x>
+      <y>580</y>
       <width>82</width>
       <height>17</height>
      </rect>
@@ -169,8 +68,8 @@
    <widget class="QRadioButton" name="radioButton_2">
     <property name="geometry">
      <rect>
-      <x>590</x>
-      <y>250</y>
+      <x>390</x>
+      <y>580</y>
       <width>82</width>
       <height>17</height>
      </rect>
@@ -182,8 +81,8 @@
    <widget class="QRadioButton" name="radioButton_3">
     <property name="geometry">
      <rect>
-      <x>590</x>
-      <y>270</y>
+      <x>500</x>
+      <y>580</y>
       <width>82</width>
       <height>17</height>
      </rect>
@@ -199,7 +98,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>684</width>
+     <width>612</width>
      <height>21</height>
     </rect>
    </property>
@@ -255,6 +154,9 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionScreenshot"/>
+   <addaction name="actionCrosshair"/>
+   <addaction name="actionIntensity_2"/>
+   <addaction name="actionBlend"/>
   </widget>
   <action name="actionFile">
    <property name="enabled">
@@ -352,6 +254,12 @@
    </property>
   </action>
   <action name="actionConsole">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../smili.qrc">
      <normaloff>:/resources/toolbar/console.png</normaloff>:/resources/toolbar/console.png</iconset>
@@ -367,6 +275,29 @@
    </property>
    <property name="text">
     <string>Screenshot</string>
+   </property>
+  </action>
+  <action name="actionCrosshair">
+   <property name="icon">
+    <iconset resource="../smili.qrc">
+     <normaloff>:/resources/toolbar/crosshairs_2D.png</normaloff>:/resources/toolbar/crosshairs_2D.png</iconset>
+   </property>
+   <property name="text">
+    <string>Crosshair</string>
+   </property>
+  </action>
+  <action name="actionIntensity_2">
+   <property name="icon">
+    <iconset resource="../smili.qrc">
+     <normaloff>:/resources/toolbar/intensity.png</normaloff>:/resources/toolbar/intensity.png</iconset>
+   </property>
+   <property name="text">
+    <string>Intensity</string>
+   </property>
+  </action>
+  <action name="actionBlend">
+   <property name="text">
+    <string>Blend</string>
    </property>
   </action>
  </widget>
