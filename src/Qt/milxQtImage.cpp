@@ -66,9 +66,10 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	actionConsole->setIcon(QIcon(":/resources/toolbar/console.png"));
 	ui.toolBar->addAction(actionConsole);
 	dockActions.append(actionConsole);
-	QObject::connect(console->dockWidget(), SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), console, SLOT(setDockDefaultArea(Qt::DockWidgetArea)));
 	mainWindow->addDockWidget(console->dockDefaultArea(), console->dockWidget());
-	console->show();
+	console->dockWidget()->hide();
+
+	
 
 	//
 	ui.toolBar->setAllowedAreas(Qt::NoToolBarArea);
@@ -77,7 +78,7 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	ui.toolBar->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint);
 	ui.toolBar->adjustSize();
 	ui.toolBar->show();
-
+	
 	//
 	QWidgetAction *comboAction = new QWidgetAction(ui.menuBar);
 	QComboBox *comboBox = new QComboBox(ui.menuBar);
