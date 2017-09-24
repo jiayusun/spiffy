@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 	std::string fileName = argv[1];
 
 	//create user iterface
-
+	
 
 	//open image
 	typedef itk::Image<float, 3> VisualizingImageType;

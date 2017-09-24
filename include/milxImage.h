@@ -151,6 +151,16 @@ public:
   */
   virtual ~Image() {};
   static vtkSmartPointer<vtkImageData> ConvertITKImageToVTKImage(itk::SmartPointer<TImage> img);
+  /*!
+  \fn Image::ConvertVTKImageToITKImage(vtkSmartPointer<vtkImageData> img)
+  \brief Converts a VTK image object to an ITK image object.
+  */
+  static itk::SmartPointer<TImage> ConvertVTKImageToITKImage(vtkSmartPointer<vtkImageData> img);
+  /*!
+  \fn Image::DuplicateImage(itk::SmartPointer<TImage> img)
+  \brief Duplicates the image into a new image.
+  */
+  static itk::SmartPointer<TImage> DuplicateImage(itk::SmartPointer<TImage> img);
 #ifndef ITK_ONLY //Requires VTK
   /*!
   \fn Image:: ApplyOrientationToVTKImage(vtkSmartPointer<vtkImageData> img, itk::SmartPointer<TImage> refImage, vtkSmartPointer<vtkMatrix4x4> &transformMatrix, const bool labelledImage, const bool flipY = true)
@@ -195,6 +205,50 @@ vtkSmartPointer<vtkImageData> Image<TImage>::ConvertITKImageToVTKImage(itk::Smar
   }
 
   return convertFilter->GetOutput();
+}
+
+template<class TImage>
+itk::SmartPointer<TImage> Image<TImage>::ConvertVTKImageToITKImage(vtkSmartPointer<vtkImageData> img)
+{
+	typedef itk::VTKImageToImageFilter<TImage> ConvertImageType;
+
+	typename ConvertImageType::Pointer convertFilter = ConvertImageType::New();
+	convertFilter->SetInput(img);
+	convertFilter->AddObserver(itk::ProgressEvent(), ProgressUpdates);
+	try
+	{
+		convertFilter->Update();
+	}
+	catch (itk::ExceptionObject & ex)
+	{
+		PrintError("Failed Converting VTK Image to ITK Image");
+		PrintError(ex.GetDescription());
+	}
+
+	itk::SmartPointer<TImage> tmpImage = DuplicateImage(convertFilter->GetOutput());
+
+	return tmpImage;
+}
+
+template<class TImage>
+itk::SmartPointer<TImage> Image<TImage>::DuplicateImage(itk::SmartPointer<TImage> img)
+{
+	typedef itk::ImageDuplicator<TImage> DuplicateType;
+
+	typename DuplicateType::Pointer duplicator = DuplicateType::New();
+	duplicator->SetInputImage(img);
+	duplicator->AddObserver(itk::ProgressEvent(), ProgressUpdates);
+	try
+	{
+		duplicator->Update();
+	}
+	catch (itk::ExceptionObject & ex)
+	{
+		PrintError("Failed Generating Duplicate Image");
+		PrintError(ex.GetDescription());
+	}
+
+	return duplicator->GetOutput();
 }
 
 #ifndef ITK_ONLY //Requires VTK
