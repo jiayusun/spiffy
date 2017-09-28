@@ -25,6 +25,7 @@
 #include "milxImage.h"
 #include "ui_spiffy.h"
 #include <QButtonGroup>
+#include <QRadioButton>
 
 typedef unsigned char charPixelType;
 typedef float floatPixelType;
@@ -65,32 +66,31 @@ public:
 		return imageData[i];
 	}
     void setView(int viewMode);
-    /*!
-        \fn milxQtImage::viewToXYPlane()
-        \brief Change view to xy-plane.
-    */
-    virtual void viewToXYPlane();
-    /*!
-        \fn milxQtImage::viewToZXPlane()
-        \brief Change view to zx-plane.
-    */
-    virtual void viewToZXPlane();
-    /*!
-        \fn milxQtImage::viewToZYPlane()
-        \brief Change view to zy-plane.
-    */
-    virtual void viewToZYPlane();
 	inline bool is8BitImage()
 	{
 		return eightbit;
 	}
 
 public slots:
-	void changeView(QString);
 	void updateWindowsWithCursors();
 	void open(int i);
 	void switchViewer();
 	void blend();
+	/*!
+	\fn milxQtImage::viewToXYPlane()
+	\brief Change view to xy-plane.
+	*/
+	void viewToXYPlane();
+	/*!
+	\fn milxQtImage::viewToZXPlane()
+	\brief Change view to zx-plane.
+	*/
+	void viewToZXPlane();
+	/*!
+	\fn milxQtImage::viewToZYPlane()
+	\brief Change view to zy-plane.
+	*/
+	void viewToZYPlane();
 	inline vtkImageMapToWindowLevelColors* GetWindowLevel(int i)
 	{
 		return viewer[i]->GetWindowLevel();
@@ -170,6 +170,9 @@ protected:
 	QPointer<milxQtConsole> console; //!< console docked window
 	QAction* actionConsole; //!< toggle action for console
 	QAction* actionToolbar;//!< toggle action for toolbar
+	QRadioButton *radio1;
+	QRadioButton *radio2;
+	QRadioButton *radio3;
 	rgbImageType::Pointer imageRGB; //!< Up to date 32-bit image data (used only internally atm)
 	charImageType::Pointer imageChar; //!< Up to date 8-bit greyscale image data
 	floatImageType::Pointer imageFloat; //!< Up to date floating point image data

@@ -1,9 +1,7 @@
 <RCC>
     <qresource prefix="/">
-        <file>resources/smilx_logo.png</file>
-        <file>resources/smilx_splash.png</file>
-        <file>resources/smilx_icon.png</file>
-        <file>resources/smili_logo.png</file>
+        <file>resources/spiffy_splash.png</file>
+        <file>resources/spiffy_icon.png</file>
         <file>resources/controls_splash.png</file>
         <file>resources/human.obj</file>
         <file>resources/toolbar/copy.png</file>
@@ -31,6 +29,11 @@
         <file>resources/toolbar/refresh.png</file>
         <file>resources/toolbar/search.png</file>
         <file>resources/toolbar/intensity.png</file>
+		<file>resources/toolbar/axial.png</file>
+		<file>resources/toolbar/blend.png</file>
+		<file>resources/toolbar/coronal.png</file>
+		<file>resources/toolbar/expand.png</file>
+		<file>resources/toolbar/sagittal.png</file>
         <file>resources/toolbar/crosshairs_2D.png</file>
         <file>resources/screenies/smili.png</file>
         <file>resources/screenies/thumbs/thumb_smili.png</file>

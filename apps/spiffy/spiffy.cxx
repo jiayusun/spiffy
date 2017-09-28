@@ -6,6 +6,7 @@
 #include <vtkRenderWindowInteractor.h>
 #include "vtkImageViewer3.h"
 #include "milxFile.h"
+#include <QSplashScreen>
 #include "milxImage.h"
 #include "milxGlobal.h"
 #include <sstream>
@@ -32,10 +33,21 @@ int main(int argc, char *argv[])
 {
 
 	QApplication app(argc, argv);
+	QPixmap icon(":resources/spiffy_icon.png");
+	app.setWindowIcon(QIcon(icon));
+
 	QFile qss(":/resources/style.qss");
 	qss.open(QFile::ReadOnly);
 	qApp->setStyleSheet(qss.readAll());
 	qss.close();
+
+	QPixmap pixmap(":resources/spiffy_splash.png");
+	QSplashScreen splash(pixmap);
+	//        splash.setMask(pixmap.mask());
+	splash.showMessage("This software is for research purposes only and is NOT approved for clinical use", Qt::AlignBottom | Qt::AlignHCenter);
+	splash.show();
+	app.processEvents();
+	
 	QMainWindow *mainWindow = new QMainWindow;
 	if (argc < 2)
 	{
@@ -59,7 +71,8 @@ int main(int argc, char *argv[])
 	image->generate(0);
 	mainWindow->setWindowTitle("SPIFFY");
 	mainWindow->show();
-	milx::PrintDebug("show show.");
+	splash.finish(mainWindow);
+	milx::PrintDebug("Generate image done.");
 	return app.exec();
 }
 

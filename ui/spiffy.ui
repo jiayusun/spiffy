@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>612</width>
+    <width>611</width>
     <height>654</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -41,6 +41,10 @@
     <property name="text">
      <string/>
     </property>
+    <property name="icon">
+     <iconset resource="../smili.qrc">
+      <normaloff>:/resources/toolbar/expand.png</normaloff>:/resources/toolbar/expand.png</iconset>
+    </property>
    </widget>
    <widget class="QVTKWidget" name="qvtkWidget">
     <property name="geometry">
@@ -52,45 +56,6 @@
      </rect>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButton">
-    <property name="geometry">
-     <rect>
-      <x>300</x>
-      <y>580</y>
-      <width>82</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Image</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_2">
-    <property name="geometry">
-     <rect>
-      <x>390</x>
-      <y>580</y>
-      <width>82</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Lable Image</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_3">
-    <property name="geometry">
-     <rect>
-      <x>500</x>
-      <y>580</y>
-      <width>82</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Blend Image</string>
-    </property>
-   </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menuBar">
@@ -98,7 +63,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>612</width>
+     <width>611</width>
      <height>21</height>
     </rect>
    </property>
@@ -157,6 +122,10 @@
    <addaction name="actionCrosshair"/>
    <addaction name="actionIntensity_2"/>
    <addaction name="actionBlend"/>
+   <addaction name="separator"/>
+   <addaction name="actionAxial"/>
+   <addaction name="actionCoronal"/>
+   <addaction name="actionSagittal"/>
   </widget>
   <action name="actionFile">
    <property name="enabled">
@@ -183,19 +152,49 @@
     <string>Save</string>
    </property>
   </action>
-  <action name="actionRefresh">
+  <action name="actionAxial">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../smili.qrc">
+     <normaloff>:/resources/toolbar/axial.png</normaloff>:/resources/toolbar/axial.png</iconset>
+   </property>
    <property name="text">
-    <string>Refresh</string>
+    <string>Axial</string>
+   </property>
+   <property name="toolTip">
+    <string>Axial</string>
    </property>
   </action>
-  <action name="actionIntensity">
+  <action name="actionCoronal">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../smili.qrc">
+     <normaloff>:/resources/toolbar/coronal.png</normaloff>:/resources/toolbar/coronal.png</iconset>
+   </property>
    <property name="text">
-    <string>Intensity</string>
+    <string>Coronal</string>
+   </property>
+   <property name="toolTip">
+    <string>Coronal</string>
    </property>
   </action>
-  <action name="actionControl">
+  <action name="actionSagittal">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../smili.qrc">
+     <normaloff>:/resources/toolbar/sagittal.png</normaloff>:/resources/toolbar/sagittal.png</iconset>
+   </property>
    <property name="text">
-    <string>Control</string>
+    <string>Sagittal</string>
+   </property>
+   <property name="toolTip">
+    <string>Sagittal</string>
    </property>
   </action>
   <action name="actionAbout">
@@ -278,6 +277,9 @@
    </property>
   </action>
   <action name="actionCrosshair">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../smili.qrc">
      <normaloff>:/resources/toolbar/crosshairs_2D.png</normaloff>:/resources/toolbar/crosshairs_2D.png</iconset>
@@ -296,6 +298,10 @@
    </property>
   </action>
   <action name="actionBlend">
+   <property name="icon">
+    <iconset resource="../smili.qrc">
+     <normaloff>:/resources/toolbar/blend.png</normaloff>:/resources/toolbar/blend.png</iconset>
+   </property>
    <property name="text">
     <string>Blend</string>
    </property>

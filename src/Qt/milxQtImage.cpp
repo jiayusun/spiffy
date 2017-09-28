@@ -35,7 +35,6 @@
 #include "milxFile.h"
 #include "milxImage.h"
 #include <QDockWidget>
-#include <QComboBox>
 #include "milxGlobal.h"
 #include <itkObjectFactoryBase.h>
 #include <vtkWindowToImageFilter.h>
@@ -84,14 +83,10 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	}
 	openSupport = extensionsOpen.c_str();
 	milx::PrintDebug("constructor");
-	btnGroup = new QButtonGroup(this);
-	btnGroup->addButton(ui.radioButton, 0);
-	btnGroup->addButton(ui.radioButton_2, 1);
-	btnGroup->addButton(ui.radioButton_3, 2);
-	ui.radioButton->setChecked(true);
 //	ui.pushButton_10->setChecked(false);
 	QPoint pos = mainWindow->mapToGlobal(QPoint(0, 0));
-	mainWindow->move(pos.x() + 150, pos.y() + 60);
+	mainWindow->move(pos.x() + 200, pos.y() + 30);
+	mainWindow->resize(611, 654);
 
 	///Setup Console
 	console = new milxQtConsole;
@@ -101,6 +96,22 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	dockActions.append(actionConsole);
 	mainWindow->addDockWidget(console->dockDefaultArea(), console->dockWidget());
 	console->dockWidget()->hide();
+
+	radio1 = new QRadioButton;
+	radio2 = new QRadioButton;
+	radio3 = new QRadioButton;
+	radio1->setText("Image");
+	radio2->setText("Label Image");
+	radio3->setText("Blend Image");
+	ui.toolBar->addWidget(radio1);
+	ui.toolBar->addWidget(radio2);
+	ui.toolBar->addWidget(radio3);
+	btnGroup = new QButtonGroup(ui.toolBar);
+	btnGroup->addButton(radio1, 0);
+	btnGroup->addButton(radio2, 1);
+	btnGroup->addButton(radio3, 2);
+	radio1->setChecked(true);
+
 	ui.toolBar->setAllowedAreas(Qt::NoToolBarArea);
 	ui.toolBar->setOrientation(Qt::Vertical);
 	ui.toolBar->move(mainWindow->pos().x() - 127, mainWindow->pos().y() + 40);
@@ -171,32 +182,13 @@ void milxQtImage::generate(int i, const bool quietly)
 	lookupTable[i] = NULL;
 
 	if (milxQtRenderWindow::useDefaultView)
+	{
 		setView(milxQtRenderWindow::defaultView); //Default view
-
+		ui.actionAxial->setChecked(true);
+	}
 	emit milxQtRenderWindow::modified(GetImageActor());
 
 printDebug("Completed Generating Image");
-}
-
-void milxQtImage::changeView(QString index)
-{
-
-	printDebug("Changing view to " + index);
-	if (index == "View: Axial")
-	{
-		viewer[currentViewer]->SetSliceOrientationToXY();
-
-	}
-	else if (index == "View: Coronal")
-	{
-		viewer[currentViewer]->SetSliceOrientationToXZ();
-
-	}
-	else if (index == "View: Sagittal")
-	{
-		viewer[currentViewer]->SetSliceOrientationToYZ();
-
-	}
 }
 
 
@@ -210,107 +202,133 @@ void milxQtImage::setView(int viewMode)
     }
 
     milxQtRenderWindow::setView(viewMode);
+	
 }
 
 void milxQtImage::viewToXYPlane()
 {
-    if(viewerSetup)
+
+	if (ui.actionAxial->isChecked())
 	{
-
 		viewer[currentViewer]->SetSliceOrientationToXY();
-
-        currentView = AXIAL;
-    }
+		currentView = AXIAL;
+		ui.actionAxial->setChecked(true);
+		ui.actionCoronal->setChecked(false);
+		ui.actionSagittal->setChecked(false);
+	}
+    
 }
+
+
 
 void milxQtImage::viewToZXPlane()
 {
-    if(viewerSetup)
+	if (ui.actionCoronal->isChecked())
 	{
-
 		viewer[currentViewer]->SetSliceOrientationToXZ();
-        currentView = CORONAL;
-    }
+		currentView = CORONAL;
+		ui.actionAxial->setChecked(false);
+		ui.actionCoronal->setChecked(true);
+		ui.actionSagittal->setChecked(false);
+	}
 }
 
 void milxQtImage::viewToZYPlane()
 {
-    if(viewerSetup)
+
+	if (ui.actionSagittal->isChecked())
 	{
 		viewer[currentViewer]->SetSliceOrientationToYZ();
-        currentView = SAGITTAL;
-    }
+		currentView = SAGITTAL;
+		ui.actionSagittal->setChecked(true);
+		ui.actionAxial->setChecked(false);
+		ui.actionCoronal->setChecked(false);
+	}
+		    
 }
 
 void milxQtImage::updateWindowsWithCursors()
 {
-
-	viewer[currentViewer]->EnableCursor();
-	ui.actionCrosshair->setChecked(true);
-	
+	if (ui.actionCrosshair->isChecked())
+	{
+		viewer[currentViewer]->EnableCursor();
+		ui.actionCrosshair->setChecked(true);
+		printInfo("enable cursor");
+	}
+	else
+	{
+		viewer[currentViewer]->DisableCursor();
+		ui.actionCrosshair->setChecked(false);
+		printInfo("disable cursor");
+	}
 }
 
 
 
 void milxQtImage::autoLevel(float percentile)
 {
-	printInfo("Auto Updating Window Level");
-	printDebug("Current Window:" + QString::number(GetIntensityWindow()));
-	printDebug("Current Level:" + QString::number(GetIntensityLevel()));
-
-	int bins = 256;
-	float belowValue = -1000, aboveValue = 4000, lowerPercentile = 1.0 - percentile, upperPercentile = percentile;
-	if (maxValue == minValue)
-		histogram(bins, belowValue, aboveValue, false); //above and below unused here, uses image min/max automatically
-	belowValue = minValue;
-	aboveValue = maxValue;
-
-	emit working(-1);
-	
-	emit done(-1);
-
-	emit working(-1);
-	//Compute the percentile contributions to trim levels for better contrast
-	size_t k = 0, kMin = 0, kMax = 0, kMid = 0;
-	double binSpacing = (aboveValue - belowValue) / bins, accummulator = 0.0, proportion = 0.0;
-	//Upper limit of histgram
-	k = 0;
-	accummulator = 0.0;
-	for (double j = belowValue; j < aboveValue; j += binSpacing, k++)
-	{
-		proportion = accummulator / hist->GetVoxelCount();
-		if (proportion >= lowerPercentile)
-			break;
-		accummulator += hist->GetOutput()->GetPointData()->GetScalars()->GetTuple1(k); //freq k
+	if (currentViewer == 2){
+		printInfo("Can not do Auto-level display on blend image");
 	}
-	kMin = k - 1;
-	double lowLevel = minValue + (kMin)*binSpacing;
-	//Lower limit of histgram
-	k = bins - 1;
-	accummulator = 0.0;
-	for (double j = aboveValue; j > belowValue; j -= binSpacing, k--)
-	{
-		proportion = accummulator / hist->GetVoxelCount();
-		if (proportion >= lowerPercentile)
-			break;
-		accummulator += hist->GetOutput()->GetPointData()->GetScalars()->GetTuple1(k); //freq k
+	else{
+		printInfo("Auto Updating Window Level");
+		printDebug("Current Window:" + QString::number(GetIntensityWindow()));
+		printDebug("Current Level:" + QString::number(GetIntensityLevel()));
+
+		int bins = 256;
+		float belowValue = -1000, aboveValue = 4000, lowerPercentile = 1.0 - percentile, upperPercentile = percentile;
+		if (maxValue == minValue)
+			histogram(bins, belowValue, aboveValue, false); //above and below unused here, uses image min/max automatically
+		belowValue = minValue;
+		aboveValue = maxValue;
+
+		emit working(-1);
+
+		emit done(-1);
+
+		emit working(-1);
+		//Compute the percentile contributions to trim levels for better contrast
+		size_t k = 0, kMin = 0, kMax = 0, kMid = 0;
+		double binSpacing = (aboveValue - belowValue) / bins, accummulator = 0.0, proportion = 0.0;
+		//Upper limit of histgram
+		k = 0;
+		accummulator = 0.0;
+		for (double j = belowValue; j < aboveValue; j += binSpacing, k++)
+		{
+			proportion = accummulator / hist->GetVoxelCount();
+			if (proportion >= lowerPercentile)
+				break;
+			accummulator += hist->GetOutput()->GetPointData()->GetScalars()->GetTuple1(k); //freq k
+		}
+		kMin = k - 1;
+		double lowLevel = minValue + (kMin)*binSpacing;
+		//Lower limit of histgram
+		k = bins - 1;
+		accummulator = 0.0;
+		for (double j = aboveValue; j > belowValue; j -= binSpacing, k--)
+		{
+			proportion = accummulator / hist->GetVoxelCount();
+			if (proportion >= lowerPercentile)
+				break;
+			accummulator += hist->GetOutput()->GetPointData()->GetScalars()->GetTuple1(k); //freq k
+		}
+		kMax = k + 1;
+		//    printDebug("k high:" + QString::number(kMax));
+		//    printDebug("accummulator high:" + QString::number(accummulator));
+		double maxLevel = minValue + (kMax)*binSpacing;
+		double windowLevel = maxLevel - lowLevel;
+		double level = lowLevel + windowLevel / 2; //center the new window from low limit
+		emit done(-1);
+
+		printDebug("Histogram Low Level:" + QString::number(lowLevel));
+		printDebug("Histogram High Level:" + QString::number(maxLevel));
+		printInfo("Window:" + QString::number(windowLevel));
+		printInfo("Level:" + QString::number(level));
+
+		viewer[currentViewer]->SetColorWindow(windowLevel);
+		viewer[currentViewer]->SetColorLevel(level);
+		viewer[currentViewer]->Render();
 	}
-	kMax = k + 1;
-	//    printDebug("k high:" + QString::number(kMax));
-	//    printDebug("accummulator high:" + QString::number(accummulator));
-	double maxLevel = minValue + (kMax)*binSpacing;
-	double windowLevel = maxLevel - lowLevel;
-	double level = lowLevel + windowLevel / 2; //center the new window from low limit
-	emit done(-1);
-
-	printDebug("Histogram Low Level:" + QString::number(lowLevel));
-	printDebug("Histogram High Level:" + QString::number(maxLevel));
-	printInfo("Window:" + QString::number(windowLevel));
-	printInfo("Level:" + QString::number(level));
-
-	viewer[currentViewer]->SetColorWindow(windowLevel);
-	viewer[currentViewer]->SetColorLevel(level);
-	viewer[currentViewer]->Render();
 }
 
 
@@ -349,11 +367,11 @@ void milxQtImage::open(int i)
 		generate(i);
 		if (i = 0)
 		{
-			ui.radioButton->setChecked(true);
+			radio1->setChecked(true);
 		}
 		if (i = 1)
 		{
-			ui.radioButton_2->setChecked(true);
+			radio2->setChecked(true);
 		}
 	}
 }
@@ -617,6 +635,11 @@ void milxQtImage::updateLookupTable(int i)
 
 void milxQtImage::blend()
 {
+	if (viewer[1]->GetInput() == NULL)
+	{
+		printInfo("You need set label Image");
+		open(1);
+	}
 	bool ok1 = true;
 	opacity = QInputDialog::getDouble(this, tr("Please Provide the opacity of the blending"),
 		tr("Opacity:"), 0.5, 0, 2147483647, 2, &ok1);
@@ -695,6 +718,7 @@ void milxQtImage::blend()
 	emit done(-1);
 	setData(blend->GetOutput(),2);
 	generate(2);
+	radio3->setChecked(true);
 }
 
 void milxQtImage::saveScreen(QString filename)
@@ -845,11 +869,14 @@ bool milxQtImage::saveImage(const QString filename, vtkImageData* data)
 
 void milxQtImage::createConnections()
 {
-	QObject::connect(ui.radioButton, SIGNAL(clicked()), this, SLOT(switchViewer()));
-	QObject::connect(ui.radioButton_2, SIGNAL(clicked()), this, SLOT(switchViewer()));
-	QObject::connect(ui.radioButton_3, SIGNAL(clicked()), this, SLOT(switchViewer()));
+	QObject::connect(radio1, SIGNAL(clicked()), this, SLOT(switchViewer()));
+	QObject::connect(radio2, SIGNAL(clicked()), this, SLOT(switchViewer()));
+	QObject::connect(radio3, SIGNAL(clicked()), this, SLOT(switchViewer()));
 	QObject::connect(ui.actionBlend, SIGNAL(triggered()), this, SLOT(blend())); 
 	QObject::connect(ui.actionCrosshair, SIGNAL(triggered()), this, SLOT(updateWindowsWithCursors()));
+	QObject::connect(ui.actionAxial, SIGNAL(triggered()), this, SLOT(viewToXYPlane()));
+	QObject::connect(ui.actionCoronal, SIGNAL(triggered()), this, SLOT(viewToZXPlane()));
+	QObject::connect(ui.actionSagittal, SIGNAL(triggered()), this, SLOT(viewToZYPlane()));
 	QSignalMapper* mapper = new QSignalMapper;
 	mapper->setMapping(ui.actionOpen_2, 0);
 	mapper->setMapping(ui.actionOpen, 1);
