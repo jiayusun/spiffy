@@ -85,7 +85,7 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	milx::PrintDebug("constructor");
 //	ui.pushButton_10->setChecked(false);
 	QPoint pos = mainWindow->mapToGlobal(QPoint(0, 0));
-	mainWindow->move(pos.x() + 200, pos.y() + 30);
+	mainWindow->move(pos.x() + 300, pos.y() + 30);
 	mainWindow->resize(611, 654);
 
 	///Setup Console
@@ -114,8 +114,9 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 
 	ui.toolBar->setAllowedAreas(Qt::NoToolBarArea);
 	ui.toolBar->setOrientation(Qt::Vertical);
-	ui.toolBar->move(mainWindow->pos().x() - 127, mainWindow->pos().y() + 40);
+	ui.toolBar->move(mainWindow->pos().x() - 127, mainWindow->pos().y() + 20);
 	ui.toolBar->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint);
+	ui.toolBar->setFixedHeight(654);
 	ui.toolBar->adjustSize();
 	ui.toolBar->hide();
 	actionToolbar = ui.toolBar->toggleViewAction();

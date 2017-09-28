@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>611</width>
+    <width>978</width>
     <height>654</height>
    </rect>
   </property>
@@ -63,7 +63,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>611</width>
+     <width>978</width>
      <height>21</height>
     </rect>
    </property>
@@ -88,6 +88,12 @@
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <property name="font">
     <font>
      <pointsize>10</pointsize>
@@ -126,6 +132,7 @@
    <addaction name="actionAxial"/>
    <addaction name="actionCoronal"/>
    <addaction name="actionSagittal"/>
+   <addaction name="separator"/>
   </widget>
   <action name="actionFile">
    <property name="enabled">
@@ -161,10 +168,13 @@
      <normaloff>:/resources/toolbar/axial.png</normaloff>:/resources/toolbar/axial.png</iconset>
    </property>
    <property name="text">
-    <string>Axial</string>
+    <string>Axial     </string>
+   </property>
+   <property name="iconText">
+    <string>Axial     </string>
    </property>
    <property name="toolTip">
-    <string>Axial</string>
+    <string>Axial     </string>
    </property>
   </action>
   <action name="actionCoronal">
@@ -176,10 +186,13 @@
      <normaloff>:/resources/toolbar/coronal.png</normaloff>:/resources/toolbar/coronal.png</iconset>
    </property>
    <property name="text">
-    <string>Coronal</string>
+    <string>Coronal   </string>
+   </property>
+   <property name="iconText">
+    <string>Coronal   </string>
    </property>
    <property name="toolTip">
-    <string>Coronal</string>
+    <string>Coronal   </string>
    </property>
   </action>
   <action name="actionSagittal">
@@ -191,10 +204,13 @@
      <normaloff>:/resources/toolbar/sagittal.png</normaloff>:/resources/toolbar/sagittal.png</iconset>
    </property>
    <property name="text">
-    <string>Sagittal</string>
+    <string>Sagittal  </string>
+   </property>
+   <property name="iconText">
+    <string>Sagittal  </string>
    </property>
    <property name="toolTip">
-    <string>Sagittal</string>
+    <string>Sagittal  </string>
    </property>
   </action>
   <action name="actionAbout">
@@ -285,7 +301,13 @@
      <normaloff>:/resources/toolbar/crosshairs_2D.png</normaloff>:/resources/toolbar/crosshairs_2D.png</iconset>
    </property>
    <property name="text">
-    <string>Crosshair</string>
+    <string>Crosshair </string>
+   </property>
+   <property name="iconText">
+    <string>Crosshair </string>
+   </property>
+   <property name="toolTip">
+    <string>Crosshair </string>
    </property>
   </action>
   <action name="actionIntensity_2">
@@ -294,7 +316,13 @@
      <normaloff>:/resources/toolbar/intensity.png</normaloff>:/resources/toolbar/intensity.png</iconset>
    </property>
    <property name="text">
-    <string>Intensity</string>
+    <string>Intensity </string>
+   </property>
+   <property name="iconText">
+    <string>Intensity </string>
+   </property>
+   <property name="toolTip">
+    <string>Intensity </string>
    </property>
   </action>
   <action name="actionBlend">
@@ -303,7 +331,13 @@
      <normaloff>:/resources/toolbar/blend.png</normaloff>:/resources/toolbar/blend.png</iconset>
    </property>
    <property name="text">
-    <string>Blend</string>
+    <string>Blend     </string>
+   </property>
+   <property name="iconText">
+    <string>Blend     </string>
+   </property>
+   <property name="toolTip">
+    <string>Blend     </string>
    </property>
   </action>
  </widget>
