@@ -176,7 +176,7 @@ protected:
 	rgbImageType::Pointer imageRGB; //!< Up to date 32-bit image data (used only internally atm)
 	charImageType::Pointer imageChar; //!< Up to date 8-bit greyscale image data
 	floatImageType::Pointer imageFloat; //!< Up to date floating point image data
-	int magnifyFactor = 2;
+	int magnifyFactor = 1;
 	/*!
 	\fn milxQtImage::updateData(const bool orient = true)
 	\brief Ensures the internal visualisation data is up to date.
