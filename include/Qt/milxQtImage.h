@@ -139,6 +139,11 @@ public slots:
 	Image is also flipped since the ITK reader orientation is different to VTK images.
 	*/
 	bool saveImage(const QString filename, vtkImageData* data);
+	/**
+	\fn milxQtImage::refresh()
+	\brief Refresh display
+	*/
+	void refresh();
 
 protected:
 	Ui_MainWindow ui;

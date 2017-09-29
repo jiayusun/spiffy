@@ -722,6 +722,14 @@ void milxQtImage::blend()
 	radio3->setChecked(true);
 }
 
+void milxQtImage::refresh()
+{
+	viewer[currentViewer]->UpdateCursor();
+	viewer[currentViewer]->GetInteractorStyle()->InvokeEvent(vtkCommand::ResetWindowLevelEvent); //Reset window level as if pressing 'r'
+	viewer[currentViewer]->Render();
+	milxQtRenderWindow::refresh();
+}
+
 void milxQtImage::saveScreen(QString filename)
 {
 	QFileDialog *fileSaver = new QFileDialog(this);
@@ -882,6 +890,7 @@ void milxQtImage::createConnections()
 	mapper->setMapping(ui.actionOpen_2, 0);
 	mapper->setMapping(ui.actionOpen, 1);
 	QObject::connect(ui.actionIntensity_2, SIGNAL(triggered()), this, SLOT(autoLevel()));
+	QObject::connect(ui.actionRefresh_2, SIGNAL(triggered()), this, SLOT(refresh()));
 	QObject::connect(ui.actionScreenshot, SIGNAL(triggered()), this, SLOT(saveScreen()));
 	QObject::connect(ui.actionOpen_2, SIGNAL(triggered()), mapper, SLOT(map()));
 	QObject::connect(ui.actionOpen, SIGNAL(triggered()), mapper, SLOT(map()));
