@@ -58,6 +58,7 @@
 #include <itkRawImageIO.h>
 #include "itkImageToVTKImageFilter.h"
 #include "itkVTKImageToImageFilter.h"
+#include "milxQtAboutForm.h"
 
 //milxQtImage
 milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderWindow(theParent, contextSystem)
@@ -86,17 +87,20 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 //	ui.pushButton_10->setChecked(false);
 	QPoint pos = mainWindow->mapToGlobal(QPoint(0, 0));
 	mainWindow->move(pos.x() + 300, pos.y() + 30);
-	mainWindow->resize(611, 654);
+//	mainWindow->resize(611, 654);
+	mainWindow->setFixedSize(611, 611);
 
 	///Setup Console
 	console = new milxQtConsole;
 	actionConsole = console->dockWidget()->toggleViewAction();
 	actionConsole->setIcon(QIcon(":/resources/toolbar/console.png"));
 	ui.toolBar->addAction(actionConsole);
+	ui.menuHelp->addAction(actionConsole);
 	dockActions.append(actionConsole);
 	mainWindow->addDockWidget(console->dockDefaultArea(), console->dockWidget());
 	console->dockWidget()->hide();
-
+	setConsole(console);
+	ui.toolBar->addSeparator();
 	radio1 = new QRadioButton;
 	radio2 = new QRadioButton;
 	radio3 = new QRadioButton;
@@ -104,23 +108,38 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	radio2->setText("Label Image");
 	radio3->setText("Blend Image");
 	ui.toolBar->addWidget(radio1);
+	ui.toolBar->addSeparator();
 	ui.toolBar->addWidget(radio2);
+	ui.toolBar->addSeparator();
 	ui.toolBar->addWidget(radio3);
 	btnGroup = new QButtonGroup(ui.toolBar);
 	btnGroup->addButton(radio1, 0);
 	btnGroup->addButton(radio2, 1);
 	btnGroup->addButton(radio3, 2);
 	radio1->setChecked(true);
-
+	radio2->setDisabled(true);
+	radio3->setDisabled(true);
 	ui.toolBar->setAllowedAreas(Qt::NoToolBarArea);
 	ui.toolBar->setOrientation(Qt::Vertical);
-	ui.toolBar->move(mainWindow->pos().x() - 127, mainWindow->pos().y() + 20);
+	ui.toolBar->move(mainWindow->pos().x() - 127, mainWindow->pos().y()-3);
 	ui.toolBar->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint);
 	ui.toolBar->setFixedHeight(654);
 	ui.toolBar->adjustSize();
 	ui.toolBar->hide();
 	actionToolbar = ui.toolBar->toggleViewAction();
+	ui.statusbar->setFixedHeight(48);
+	expand = new QPushButton();
+	expand->setFixedWidth(40);
+	expand->setFixedHeight(40);
+	expand->setIcon(QIcon(":/resources/toolbar/expand.png"));
+	ui.statusbar->addWidget(expand);
+	cor = new QLabel("");
+	ui.statusbar->addPermanentWidget(cor);
 	createConnections();
+	QSignalMapper* mapper = new QSignalMapper;
+	mapper->setMapping(ui.actionExit, mainWindow);
+	QObject::connect(ui.actionExit, SIGNAL(triggered()), mapper, SLOT(map()));
+	QObject::connect(mapper, SIGNAL(mapped(QWidget*)), this, SLOT(close(QWidget*)));
 }
 
 milxQtImage::~milxQtImage()
@@ -130,6 +149,7 @@ milxQtImage::~milxQtImage()
 
 void milxQtImage::setData(vtkSmartPointer<vtkImageData> newImg,int i)
 {
+	setConsole(console);
 	imageData[i]->DeepCopy(newImg);
 	usingVTKImage = true;
 	eightbit = false;
@@ -147,6 +167,7 @@ void milxQtImage::setData(vtkSmartPointer<vtkImageData> newImg,int i)
 
 void milxQtImage::generate(int i, const bool quietly)
 {
+	setConsole(console);
 	int bounds[6];
 	currentViewer = i;
 	emit working(-1);
@@ -188,6 +209,7 @@ void milxQtImage::generate(int i, const bool quietly)
 		ui.actionAxial->setChecked(true);
 	}
 	emit milxQtRenderWindow::modified(GetImageActor());
+	enableUpdates(ui.statusbar);
 
 printDebug("Completed Generating Image");
 }
@@ -195,6 +217,7 @@ printDebug("Completed Generating Image");
 
 void milxQtImage::setView(int viewMode)
 {
+	setConsole(console);
     if(!volume)
     {
         printDebug("Volume is 2D. Not changing view to " + QString::number(viewMode));
@@ -208,7 +231,7 @@ void milxQtImage::setView(int viewMode)
 
 void milxQtImage::viewToXYPlane()
 {
-
+	setConsole(console);
 	if (ui.actionAxial->isChecked())
 	{
 		viewer[currentViewer]->SetSliceOrientationToXY();
@@ -224,6 +247,7 @@ void milxQtImage::viewToXYPlane()
 
 void milxQtImage::viewToZXPlane()
 {
+	setConsole(console);
 	if (ui.actionCoronal->isChecked())
 	{
 		viewer[currentViewer]->SetSliceOrientationToXZ();
@@ -236,7 +260,7 @@ void milxQtImage::viewToZXPlane()
 
 void milxQtImage::viewToZYPlane()
 {
-
+	setConsole(console);
 	if (ui.actionSagittal->isChecked())
 	{
 		viewer[currentViewer]->SetSliceOrientationToYZ();
@@ -250,6 +274,7 @@ void milxQtImage::viewToZYPlane()
 
 void milxQtImage::updateWindowsWithCursors()
 {
+	setConsole(console);
 	if (ui.actionCrosshair->isChecked())
 	{
 		viewer[currentViewer]->EnableCursor();
@@ -268,6 +293,7 @@ void milxQtImage::updateWindowsWithCursors()
 
 void milxQtImage::autoLevel(float percentile)
 {
+	setConsole(console);
 	if (currentViewer == 2){
 		printInfo("Can not do Auto-level display on blend image");
 	}
@@ -335,6 +361,7 @@ void milxQtImage::autoLevel(float percentile)
 
 void milxQtImage::open(int i)
 {
+	setConsole(console);
 	QFileDialog *fileOpener = new QFileDialog(this);
 	QSettings settings("Shekhar Chandra", "milxQt");
 
@@ -369,16 +396,20 @@ void milxQtImage::open(int i)
 		if (i = 0)
 		{
 			radio1->setChecked(true);
+
 		}
 		if (i = 1)
 		{
+			radio2->setDisabled(false);
 			radio2->setChecked(true);
+
 		}
 	}
 }
 
 void milxQtImage::switchViewer()
 {
+	setConsole(console);
 	switch (btnGroup->checkedId())
 	{
 	case 0:
@@ -396,7 +427,7 @@ void milxQtImage::switchViewer()
 
 void milxQtImage::updateData(const bool orient)
 {
-	printInfo("3");
+	setConsole(console);
 	if (!usingVTKImage)
 	{
 		printDebug("Updating Data");
@@ -459,6 +490,7 @@ void milxQtImage::updateData(const bool orient)
 
 void milxQtImage::histogram(int bins, float belowValue, float aboveValue, bool plotHistogram)
 {
+	setConsole(console);
 	printInfo("Computing Histogram of Image");
 	updateData(true);
 	double range[2];
@@ -578,6 +610,7 @@ double milxQtImage::GetIntensityLevel()
 
 void milxQtImage::colourMapToHSV(int i, double minRange, double maxRange)
 {
+	setConsole(console);
 	double range[2];
 	if (minRange == 0.0 && maxRange == 0.0)
 		GetDataSet(i)->GetScalarRange(range); //This will propagate upwards to get the range for images or meshes
@@ -599,6 +632,7 @@ void milxQtImage::colourMapToHSV(int i, double minRange, double maxRange)
 
 void milxQtImage::colourMapToGray(int i,double minRange, double maxRange)
 {
+	setConsole(console);
 	double range[2];
 	if (minRange == 0.0 && maxRange == 0.0)
 		GetDataSet(i)->GetScalarRange(range); //This will propagate upwards to get the range for images or meshes
@@ -620,6 +654,7 @@ void milxQtImage::colourMapToGray(int i,double minRange, double maxRange)
 
 void milxQtImage::updateLookupTable(int i)
 {
+	setConsole(console);
 	double range[2];
 	imageData[i]->GetScalarRange(range);
 
@@ -636,6 +671,7 @@ void milxQtImage::updateLookupTable(int i)
 
 void milxQtImage::blend()
 {
+	setConsole(console);
 	if (viewer[1]->GetInput() == NULL)
 	{
 		printInfo("You need set label Image");
@@ -719,6 +755,7 @@ void milxQtImage::blend()
 	emit done(-1);
 	setData(blend->GetOutput(),2);
 	generate(2);
+	radio3->setDisabled(false);
 	radio3->setChecked(true);
 }
 
@@ -732,6 +769,7 @@ void milxQtImage::refresh()
 
 void milxQtImage::saveScreen(QString filename)
 {
+	setConsole(console);
 	QFileDialog *fileSaver = new QFileDialog(this);
 
 	QSettings settings("Shekhar Chandra", "milxQt");
@@ -771,6 +809,7 @@ void milxQtImage::saveScreen(QString filename)
 
 bool milxQtImage::saveImage(const QString filename, vtkImageData* data)
 {
+	setConsole(console);
 	QFileInfo fileInfo(filename);
 	QString extension = fileInfo.suffix().toLower();
 	bool charFormat = false, integerFormat = false, medical = true, vtkFormat = false, success = false;
@@ -876,6 +915,62 @@ bool milxQtImage::saveImage(const QString filename, vtkImageData* data)
 	return success;
 }
 
+void milxQtImage::about()
+{
+	milxQtAboutForm aboutForm(this);
+
+	aboutForm.exec();
+}
+
+void milxQtImage::enableUpdates(QStatusBar *bar)
+{
+	if (!dataPicker)
+		dataPicker = vtkSmartPointer<vtkPointPicker>::New();
+	Connector->Connect(ui.qvtkWidget->GetRenderWindow()->GetInteractor(),
+		vtkCommand::MouseMoveEvent,
+		this,
+		SLOT(updateCoords(vtkObject*)));
+
+	//updateBar = bar;
+}
+
+void milxQtImage::updateCoords(vtkObject *obj)
+{
+	///Get interactor
+	vtkRenderWindowInteractor* iren = vtkRenderWindowInteractor::SafeDownCast(obj);
+	QString message = "";
+
+	///Get event position
+	///Code initial by Mark Wyszomierski 2003-2007 @ devsample
+	///Modified by Shekhar Chandra
+	///Do the pick. It will return a non-zero value if we intersected the image.
+	if (dataPicker->Pick(iren->GetEventPosition()[0],
+		iren->GetEventPosition()[1],
+		0,  // always zero.
+		renderer))
+	{
+		// Get the mapped position of the mouse using the picker.
+		double point[3];
+		dataPicker->GetPickPosition(point);
+
+		// Get the volume index within the entire volume now.
+		vtkIdType nVolIdx = dataPicker->GetPointId();
+		message = "Point " + QString::number(nVolIdx) + ": (" + QString::number(point[0]) + ", " + QString::number(point[1]) + ", " + QString::number(point[2]) + ")";
+		
+	}
+
+	///Write message to status bar
+	cor->setText(message);
+}
+
+void milxQtImage::close(QWidget *parent)
+{
+	printDebug("Closing Main Window");
+	QMainWindow *mainWindow = qobject_cast<QMainWindow *>(parent);
+	mainWindow->close();
+}
+
+
 void milxQtImage::createConnections()
 {
 	QObject::connect(radio1, SIGNAL(clicked()), this, SLOT(switchViewer()));
@@ -886,6 +981,7 @@ void milxQtImage::createConnections()
 	QObject::connect(ui.actionAxial, SIGNAL(triggered()), this, SLOT(viewToXYPlane()));
 	QObject::connect(ui.actionCoronal, SIGNAL(triggered()), this, SLOT(viewToZXPlane()));
 	QObject::connect(ui.actionSagittal, SIGNAL(triggered()), this, SLOT(viewToZYPlane()));
+	QObject::connect(ui.actionAbout_2, SIGNAL(triggered()), this, SLOT(about()));
 	QSignalMapper* mapper = new QSignalMapper;
 	mapper->setMapping(ui.actionOpen_2, 0);
 	mapper->setMapping(ui.actionOpen, 1);
@@ -895,7 +991,7 @@ void milxQtImage::createConnections()
 	QObject::connect(ui.actionOpen_2, SIGNAL(triggered()), mapper, SLOT(map()));
 	QObject::connect(ui.actionOpen, SIGNAL(triggered()), mapper, SLOT(map()));
 	QObject::connect(mapper, SIGNAL(mapped(int)), this, SLOT(open(int)));
-	QObject::connect(ui.pushButton_10, SIGNAL(clicked()), actionToolbar, SLOT(trigger()));
+	QObject::connect(expand, SIGNAL(clicked()), actionToolbar, SLOT(trigger()));
 
 }
 

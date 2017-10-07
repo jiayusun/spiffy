@@ -16,6 +16,10 @@ ELSE(VTK_QT_VERSION VERSION_GREATER "4")
   INCLUDE(${QT_USE_FILE})
 ENDIF(VTK_QT_VERSION VERSION_GREATER "4")
 
+if(POLICY CMP0020)
+cmake_policy(SET CMP0020 OLD)
+endif()
+
 PROJECT(milx-Qt)
 
 # Add Sources
@@ -45,6 +49,14 @@ add_definitions (-DMILXQT_DLL -DMILXQT_MAKEDLL)
 if (MILXQT_64)
 	add_definitions (-DMILXQT_64)
 endif (MILXQT_64)
+
+if(POLICY CMP0043)
+  # Do not ignore `COMPILE_DEFINITIONS_<Config>` properties
+  #   defined by `qt5_use_modules`, in Qt5CoreMacros.cmake
+  # http://www.cmake.org/cmake/help/v3.0/policy/CMP0043.html
+  cmake_policy(SET CMP0043 OLD)
+endif()
+
 
 IF(VTK_QT_VERSION VERSION_GREATER "4")
   # generate rules for building source files from the resources

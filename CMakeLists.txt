@@ -27,6 +27,10 @@ if(MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /bigobj")
 endif(MSVC)
 
+if(POLICY CMP0020)
+cmake_policy(SET CMP0020 OLD)
+endif()
+
 # Enable/Disable Build the testing
 OPTION(BUILD_SHARED_LIBS "Build the Libraries as shared libraries" ON)
 OPTION(BUILD_GUI_RELATED "Build the MILX Qt Related Components" ON)

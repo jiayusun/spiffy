@@ -35,6 +35,10 @@ IF(USE_VTK)
     )
 ENDIF(USE_VTK)
 
+if(POLICY CMP0020)
+cmake_policy(SET CMP0020 OLD)
+endif()
+
 # 64-bit Build?
 #set (SMILI_64 ON) #True
 set (SMILI_64 OFF) #False

@@ -1600,7 +1600,7 @@ void milxQtRenderWindow::enableUpdates(QStatusBar *bar)
 {
     if(!dataPicker)
         dataPicker = vtkSmartPointer<vtkPointPicker>::New();
-
+	printInfo("pick");
     Connector->Connect( QVTKWidget::GetRenderWindow()->GetInteractor(),
                         vtkCommand::MouseMoveEvent,
                         this,
@@ -1613,7 +1613,7 @@ void milxQtRenderWindow::updateCoords(vtkObject *obj)
 {
     ///Get interactor
     vtkRenderWindowInteractor* iren = vtkRenderWindowInteractor::SafeDownCast(obj);
-
+	printInfo("iren");
     QString message = "";
 
     ///Get event position

@@ -26,6 +26,7 @@
 #include "ui_spiffy.h"
 #include <QButtonGroup>
 #include <QRadioButton>
+#include <QPushButton>
 
 typedef unsigned char charPixelType;
 typedef float floatPixelType;
@@ -58,6 +59,12 @@ public:
 	\brief Opens a file for viewing in the current tab.
 	*/
 	bool loadFile(const QString &filename);
+	void enableUpdates(QStatusBar *bar);
+	/*!
+	\fn milxQtRenderWindow::updateCoords(vtkObject *obj)
+	\brief Picks the coordinates and pixel value from the current mouse position in the window.
+	*/
+	virtual void updateCoords(vtkObject *obj);
 	/*!
 	\brief Get the data, return the vtkImageData object downcast to vtkDataSet, useful for getting scalar range etc.
 	*/
@@ -144,12 +151,19 @@ public slots:
 	\brief Refresh display
 	*/
 	void refresh();
-
+	/*!
+	\fn milxQtImage::about()
+	\brief Show the about information.
+	*/
+	void about();
+	void close(QWidget *parent);
 protected:
 	Ui_MainWindow ui;
 	bool viewerSetup; //!< has the viewer/window been setup (only done initial so is to not disturb users settings)
 	bool volume; //!< is the image a volume?
 	float opacity = 0.5;
+	QPushButton *expand;
+	QLabel *cor;
 	vtkSmartPointer<vtkImageAccumulate> hist; //!< Histogram filter, allocated on histogram() call
 	bool track; //!< track the coordinates during user interaction
 	///Other Variables
@@ -163,6 +177,7 @@ protected:
 	bool eightbit; //!< Using eightbit data?
 	bool rgb; //!< Using RGB data?
 	QString openSupport; //!< Load file extension support list, cats all known extensions.
+	//QStatusBar *updateBar;
 	bool vectorised; //!< Using Vector image data?
 	bool flipped; //!< Flip for display?
 	int currentViewer;
