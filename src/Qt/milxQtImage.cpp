@@ -20,32 +20,30 @@
 //VTK Libraries
 #include "milxQtImage.h"
 #include "milxFile.h"
+#include "milxImage.h"
+#include "milxQtAboutForm.h"
+#include "milxGlobal.h"
+#include "milxQtAliases.h"
+#include "milxColourMap.h"
+#include "ui_spiffy.h"
+#include <sstream>
+#include <QDockWidget>
 #include <QApplication>
 #include <QInputDialog>
 #include <QFile>
 #include <QMainWindow>
-#include "milxQtImage.h"
-#include <vtkRenderWindowInteractor.h>
-#include <vtkImageBlend.h>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <vtkImageMapToWindowLevelColors.h>
 #include <vtkImageMapToColors.h>
 #include "vtkImageViewer3.h"
-#include "milxFile.h"
-#include "milxImage.h"
-#include <QDockWidget>
-#include "milxGlobal.h"
-#include <itkObjectFactoryBase.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkImageBlend.h>
 #include <vtkWindowToImageFilter.h>
-#include <sstream>
-#include "ui_spiffy.h"
 #include <vtkImageAccumulate.h>
-#include "milxQtAliases.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkPointData.h"
 #include "vtkFloatArray.h"
-#include "milxColourMap.h"
 
 ///ITK Imaging
 #include <itkImage.h>
@@ -58,7 +56,7 @@
 #include <itkRawImageIO.h>
 #include "itkImageToVTKImageFilter.h"
 #include "itkVTKImageToImageFilter.h"
-#include "milxQtAboutForm.h"
+#include <itkObjectFactoryBase.h>
 
 //milxQtImage
 milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderWindow(theParent, contextSystem)
@@ -135,6 +133,7 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	ui.statusbar->addWidget(expand);
 	cor = new QLabel("");
 	ui.statusbar->addPermanentWidget(cor);
+	readSettings(mainWindow);
 	createConnections();
 	QSignalMapper* mapper = new QSignalMapper;
 	mapper->setMapping(ui.actionExit, mainWindow);
@@ -203,11 +202,25 @@ void milxQtImage::generate(int i, const bool quietly)
 	}
 	lookupTable[i] = NULL;
 
-	if (milxQtRenderWindow::useDefaultView)
+	if (index == 0)
 	{
-		setView(milxQtRenderWindow::defaultView); //Default view
 		ui.actionAxial->setChecked(true);
+		viewToXYPlane();
 	}
+
+	else if (index == 1)
+	{
+		ui.actionCoronal->setChecked(true);
+		viewToZXPlane();
+
+	}
+	else if (index == 2)
+	{
+		ui.actionSagittal->setChecked(true);
+		viewToZYPlane();
+
+	}
+
 	emit milxQtRenderWindow::modified(GetImageActor());
 	enableUpdates(ui.statusbar);
 
@@ -215,27 +228,13 @@ printDebug("Completed Generating Image");
 }
 
 
-void milxQtImage::setView(int viewMode)
-{
-	setConsole(console);
-    if(!volume)
-    {
-        printDebug("Volume is 2D. Not changing view to " + QString::number(viewMode));
-        viewToXYPlane();
-        return;
-    }
-
-    milxQtRenderWindow::setView(viewMode);
-	
-}
-
 void milxQtImage::viewToXYPlane()
 {
 	setConsole(console);
 	if (ui.actionAxial->isChecked())
 	{
 		viewer[currentViewer]->SetSliceOrientationToXY();
-		currentView = AXIAL;
+		currentView[currentViewer] = AXIAL;
 		ui.actionAxial->setChecked(true);
 		ui.actionCoronal->setChecked(false);
 		ui.actionSagittal->setChecked(false);
@@ -251,7 +250,7 @@ void milxQtImage::viewToZXPlane()
 	if (ui.actionCoronal->isChecked())
 	{
 		viewer[currentViewer]->SetSliceOrientationToXZ();
-		currentView = CORONAL;
+		currentView[currentViewer] = CORONAL;
 		ui.actionAxial->setChecked(false);
 		ui.actionCoronal->setChecked(true);
 		ui.actionSagittal->setChecked(false);
@@ -264,7 +263,7 @@ void milxQtImage::viewToZYPlane()
 	if (ui.actionSagittal->isChecked())
 	{
 		viewer[currentViewer]->SetSliceOrientationToYZ();
-		currentView = SAGITTAL;
+		currentView[currentViewer] = SAGITTAL;
 		ui.actionSagittal->setChecked(true);
 		ui.actionAxial->setChecked(false);
 		ui.actionCoronal->setChecked(false);
@@ -970,6 +969,44 @@ void milxQtImage::close(QWidget *parent)
 	mainWindow->close();
 }
 
+void milxQtImage::writeSettings(QWidget *parent)
+{
+	QSettings settings("Shekhar Chandra", "milxQt");
+	settings.beginGroup("milxQtImage");
+	QMainWindow *mainWindow = qobject_cast<QMainWindow *>(parent);
+	settings.setValue("windowState", mainWindow->saveState());	
+	if (currentView[0] == AXIAL)
+	{
+		settings.setValue("ImageView" , 0);
+	}
+	else if (currentView[0] == CORONAL)
+	{
+		settings.setValue("ImageView" , 1);
+	}
+	else if (currentView[0] == SAGITTAL)
+	{
+		settings.setValue("ImageView" , 2);
+	}
+	settings.endGroup();
+	printDebug("saveSetting");
+}
+
+void milxQtImage::readSettings(QMainWindow *parent)
+{
+	QSettings settings("Shekhar Chandra", "milxQt");
+
+	settings.beginGroup("milxQtImage");
+	parent->restoreState(settings.value("windowState").toByteArray());
+
+	index = settings.value("ImageView",defaultView).toInt();
+	
+
+	///Handle saving dock positions/areas etc.
+	settings.endGroup();
+	parent->restoreDockWidget(console->dockWidget());
+	printDebug("ReadSettings");
+	//use value in view to set view in viewer
+}
 
 void milxQtImage::createConnections()
 {

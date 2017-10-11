@@ -71,8 +71,13 @@ int main(int argc, char *argv[])
 	image->generate(0);
 	mainWindow->setWindowTitle("SPIFFY");
 	mainWindow->show();
+	QSignalMapper *mapper = new QSignalMapper;
+	mapper->setMapping(&app, mainWindow);
+	QObject::connect(&app, SIGNAL(aboutToQuit()), mapper, SLOT(map()));
+	QObject::connect(mapper, SIGNAL(mapped(QWidget*)), image, SLOT(writeSettings(QWidget*)));
 	splash.finish(mainWindow);
 	milx::PrintDebug("Generate image done.");
+
 	return app.exec();
 }
 

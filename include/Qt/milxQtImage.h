@@ -72,7 +72,7 @@ public:
 	{
 		return imageData[i];
 	}
-    void setView(int viewMode);
+
 	inline bool is8BitImage()
 	{
 		return eightbit;
@@ -157,12 +157,16 @@ public slots:
 	*/
 	void about();
 	void close(QWidget *parent);
+	void writeSettings(QWidget *parent);
+	void readSettings(QMainWindow *parent);
 protected:
 	Ui_MainWindow ui;
 	bool viewerSetup; //!< has the viewer/window been setup (only done initial so is to not disturb users settings)
 	bool volume; //!< is the image a volume?
 	float opacity = 0.5;
+	int currentView[3]; //!< Current view for data
 	QPushButton *expand;
+	int index;
 	QLabel *cor;
 	vtkSmartPointer<vtkImageAccumulate> hist; //!< Histogram filter, allocated on histogram() call
 	bool track; //!< track the coordinates during user interaction
