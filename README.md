@@ -1,1 +1,1 @@
-﻿![SPIFFY Logo](resources/controls_splash.png)
+﻿![SPIFFY Logo](resources/spiffy_splash.png)
