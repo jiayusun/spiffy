@@ -77,6 +77,17 @@ public:
 	{
 		return eightbit;
 	}
+	/*!
+	\fn milxQtMain::dragEnterEvent(QDragEnterEvent *event)
+	\brief Part of the Drag and Drop feature members. Tells what drags to accept.
+	*/
+	void dragEnterEvent(QDragEnterEvent *event);
+	/*!
+	\fn milxQtMain::dropEvent(QDropEvent *event)
+	\brief Part of the Drag and Drop feature members. Opens the dropped files.
+	*/
+	void dropEvent(QDropEvent *event);
+	bool eventFilter(QObject* obj, QEvent* ev);
 
 public slots:
 	void updateWindowsWithCursors();
@@ -159,14 +170,17 @@ public slots:
 	void close(QWidget *parent);
 	void writeSettings(QWidget *parent);
 	void readSettings(QMainWindow *parent);
+
 protected:
 	Ui_MainWindow ui;
+	int bounds[6];
 	bool viewerSetup; //!< has the viewer/window been setup (only done initial so is to not disturb users settings)
 	bool volume; //!< is the image a volume?
 	float opacity = 0.5;
 	int currentView[3]; //!< Current view for data
 	QPushButton *expand;
-	int index;
+	int index;//orientation
+	int count = -1;
 	QLabel *cor;
 	vtkSmartPointer<vtkImageAccumulate> hist; //!< Histogram filter, allocated on histogram() call
 	bool track; //!< track the coordinates during user interaction
@@ -185,7 +199,8 @@ protected:
 	bool vectorised; //!< Using Vector image data?
 	bool flipped; //!< Flip for display?
 	int currentViewer;
-	QButtonGroup *btnGroup;
+	QButtonGroup *radioButtonGroup;
+	QActionGroup *orientationGroup;
 	vtkSmartPointer<vtkImageViewer3> viewer[3]; //!< VTK Viewer handler, Smart Pointer
 	vtkSmartPointer<vtkImageData> imageData[3];
 	vtkSmartPointer<vtkLookupTable> lookupTable[3]; //!< Lookup table for the shapes/images, base class is used to allow references to different look up table types
@@ -211,7 +226,6 @@ protected:
 	\brief Creates the signals and slots connections within the main window.
 	*/
 	void createConnections();
-
 
 };
 

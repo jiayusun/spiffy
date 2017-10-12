@@ -53,31 +53,40 @@ int main(int argc, char *argv[])
 	{
 		cerr << "View an image with correct orientation." << endl;
 		cerr << "Usage: " << argv[0] << " <image>" << endl;
-		exit(EXIT_FAILURE);
+		milxQtImage *image = new milxQtImage(mainWindow);
+		mainWindow->setWindowTitle("SPIFFY");
+		mainWindow->show();
+		QSignalMapper *mapper = new QSignalMapper;
+		mapper->setMapping(&app, mainWindow);
+		QObject::connect(&app, SIGNAL(aboutToQuit()), mapper, SLOT(map()));
+		QObject::connect(mapper, SIGNAL(mapped(QWidget*)), image, SLOT(writeSettings(QWidget*)));
+		splash.finish(mainWindow);
+		milx::PrintDebug("Generate image done.");
 	}
-	std::string fileName = argv[1];
+	else
+	{
+		std::string fileName = argv[1];
 
-	//create user iterface
+		//open image
+		typedef itk::Image<float, 3> VisualizingImageType;
+		VisualizingImageType::Pointer imageType = VisualizingImageType::New();
+		vtkSmartPointer<vtkImageData> imageVTK = openImage<VisualizingImageType>(fileName, imageType);
+
+		//load image 
+		milxQtImage *image = new milxQtImage(mainWindow);
+		image->setData(imageVTK, 0);
+		image->generate(0);
+
+		mainWindow->setWindowTitle("SPIFFY");
+		mainWindow->show();
+		QSignalMapper *mapper = new QSignalMapper;
+		mapper->setMapping(&app, mainWindow);
+		QObject::connect(&app, SIGNAL(aboutToQuit()), mapper, SLOT(map()));
+		QObject::connect(mapper, SIGNAL(mapped(QWidget*)), image, SLOT(writeSettings(QWidget*)));
+		splash.finish(mainWindow);
+		milx::PrintDebug("Generate image done.");
+	}
 	
-
-	//open image
-	typedef itk::Image<float, 3> VisualizingImageType;
-	VisualizingImageType::Pointer imageType = VisualizingImageType::New();
-	vtkSmartPointer<vtkImageData> imageVTK = openImage<VisualizingImageType>(fileName, imageType);
-
-	//load image 
-	milxQtImage *image = new milxQtImage(mainWindow);
-	image->setData(imageVTK,0);
-	image->generate(0);
-	mainWindow->setWindowTitle("SPIFFY");
-	mainWindow->show();
-	QSignalMapper *mapper = new QSignalMapper;
-	mapper->setMapping(&app, mainWindow);
-	QObject::connect(&app, SIGNAL(aboutToQuit()), mapper, SLOT(map()));
-	QObject::connect(mapper, SIGNAL(mapped(QWidget*)), image, SLOT(writeSettings(QWidget*)));
-	splash.finish(mainWindow);
-	milx::PrintDebug("Generate image done.");
-
 	return app.exec();
 }
 

@@ -72,7 +72,12 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	actualNumberOfDimensions = 3;
 
 	QMainWindow *mainWindow = qobject_cast<QMainWindow *>(theParent);
+	mainWindow->installEventFilter(this);
+	mainWindow->setAcceptDrops(true);
 	ui.setupUi(mainWindow);
+	vtkRenderWindow* renWin = vtkRenderWindow::New();
+	ui.qvtkWidget->SetRenderWindow(renWin);
+	renWin->Delete();
 	minValue = 0;
 	maxValue = 0;
 	for (int j = 0; j < 3; j++)
@@ -87,6 +92,11 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	mainWindow->move(pos.x() + 300, pos.y() + 30);
 //	mainWindow->resize(611, 654);
 	mainWindow->setFixedSize(611, 611);
+	mainWindow->setWindowFlags((windowFlags() | Qt::CustomizeWindowHint) & ~Qt::WindowMaximizeButtonHint);//remove maximize button and resize handles from window?
+	orientationGroup = new QActionGroup(ui.toolBar);
+	orientationGroup->addAction(ui.actionAxial);
+	orientationGroup->addAction(ui.actionCoronal);
+	orientationGroup->addAction(ui.actionSagittal);
 
 	///Setup Console
 	console = new milxQtConsole;
@@ -110,10 +120,10 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	ui.toolBar->addWidget(radio2);
 	ui.toolBar->addSeparator();
 	ui.toolBar->addWidget(radio3);
-	btnGroup = new QButtonGroup(ui.toolBar);
-	btnGroup->addButton(radio1, 0);
-	btnGroup->addButton(radio2, 1);
-	btnGroup->addButton(radio3, 2);
+	radioButtonGroup = new QButtonGroup(ui.toolBar);
+	radioButtonGroup->addButton(radio1, 0);
+	radioButtonGroup->addButton(radio2, 1);
+	radioButtonGroup->addButton(radio3, 2);
 	radio1->setChecked(true);
 	radio2->setDisabled(true);
 	radio3->setDisabled(true);
@@ -139,6 +149,28 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	mapper->setMapping(ui.actionExit, mainWindow);
 	QObject::connect(ui.actionExit, SIGNAL(triggered()), mapper, SLOT(map()));
 	QObject::connect(mapper, SIGNAL(mapped(QWidget*)), this, SLOT(close(QWidget*)));
+
+}
+
+bool milxQtImage::eventFilter(QObject* obj, QEvent* ev){
+	QMainWindow* widget = qobject_cast<QMainWindow*>(obj);
+	if (ev->type() == QEvent::DragEnter){
+		//you can compare widget against the stack of widgets you have
+		QDragEnterEvent *k = (QDragEnterEvent *)ev;
+		printInfo("de");
+		//if you want to stop widget from receiving the event you can return true
+		dragEnterEvent(k);
+		return true;
+	}
+	if (ev->type() == QEvent::Drop){
+		//you can compare widget against the stack of widgets you have
+		QDropEvent *kd = (QDropEvent *)ev;
+		printInfo("drop");
+		//if you want to stop widget from receiving the event you can return true
+		dropEvent(kd);
+		return true;
+	}
+	return false;
 }
 
 milxQtImage::~milxQtImage()
@@ -167,7 +199,6 @@ void milxQtImage::setData(vtkSmartPointer<vtkImageData> newImg,int i)
 void milxQtImage::generate(int i, const bool quietly)
 {
 	setConsole(console);
-	int bounds[6];
 	currentViewer = i;
 	emit working(-1);
 	updateData(true);
@@ -234,7 +265,9 @@ void milxQtImage::viewToXYPlane()
 	if (ui.actionAxial->isChecked())
 	{
 		viewer[currentViewer]->SetSliceOrientationToXY();
-		currentView[currentViewer] = AXIAL;
+		if (volume)
+			viewer[currentViewer]->SetSlice(bounds[5] / 2); //show middle of volume
+		index = 0;
 		ui.actionAxial->setChecked(true);
 		ui.actionCoronal->setChecked(false);
 		ui.actionSagittal->setChecked(false);
@@ -250,7 +283,9 @@ void milxQtImage::viewToZXPlane()
 	if (ui.actionCoronal->isChecked())
 	{
 		viewer[currentViewer]->SetSliceOrientationToXZ();
-		currentView[currentViewer] = CORONAL;
+		if (volume)
+			viewer[currentViewer]->SetSlice(bounds[5] / 2); //show middle of volume
+		index = 1;
 		ui.actionAxial->setChecked(false);
 		ui.actionCoronal->setChecked(true);
 		ui.actionSagittal->setChecked(false);
@@ -263,7 +298,9 @@ void milxQtImage::viewToZYPlane()
 	if (ui.actionSagittal->isChecked())
 	{
 		viewer[currentViewer]->SetSliceOrientationToYZ();
-		currentView[currentViewer] = SAGITTAL;
+		if (volume)
+			viewer[currentViewer]->SetSlice(bounds[5] / 2); //show middle of volume
+		index = 2;
 		ui.actionSagittal->setChecked(true);
 		ui.actionAxial->setChecked(false);
 		ui.actionCoronal->setChecked(false);
@@ -409,19 +446,7 @@ void milxQtImage::open(int i)
 void milxQtImage::switchViewer()
 {
 	setConsole(console);
-	switch (btnGroup->checkedId())
-	{
-	case 0:
-		generate(0);
-		break;
-	case 1:
-		generate(1);
-		break;
-	case 2:
-		generate(2);
-		break;
-	}
-	
+	generate(radioButtonGroup->checkedId());
 }
 
 void milxQtImage::updateData(const bool orient)
@@ -676,52 +701,56 @@ void milxQtImage::blend()
 		printInfo("You need set label Image");
 		open(1);
 	}
-	bool ok1 = true;
-	opacity = QInputDialog::getDouble(this, tr("Please Provide the opacity of the blending"),
-		tr("Opacity:"), 0.5, 0, 2147483647, 2, &ok1);
-
-	if (!ok1)
-		return;
-//	initialiseWindowTraversal();
-	if (is8BitImage()) //follow up images expected to be a label
+	if (viewer[1]->GetInput() != NULL)
 	{
-		colourMapToHSV(0);
-		colourMapToHSV(1);
-	}else
-	{
-		colourMapToGray(0);
-		colourMapToGray(1);
-	}
-	vtkSmartPointer<vtkImageMapToColors> filterColorsImage = vtkSmartPointer<vtkImageMapToColors>::New();
-	filterColorsImage->SetLookupTable(GetLookupTable(0));
-#if VTK_MAJOR_VERSION <= 5
-	filterColorsImage->SetInput(imageData[0]);
-#else
-	filterColorsImage->SetInputData(imageData[0]);
-#endif
-	filterColorsImage->PassAlphaToOutputOn();
-	filterColorsImage->Update();
-	vtkSmartPointer<vtkImageData> ucharData1 = filterColorsImage->GetOutput();
 
-	int initialExtent[6];
-	imageData[0]->GetExtent(initialExtent);
+		bool ok1 = true;
+		opacity = QInputDialog::getDouble(this, tr("Please Provide the opacity of the blending"),
+			tr("Opacity:"), 0.5, 0, 2147483647, 2, &ok1);
 
-	// Combine the images (blend takes multiple connections on the 0th input port)
-	emit working(-1);
-	vtkSmartPointer<vtkImageBlend> blend = vtkSmartPointer<vtkImageBlend>::New();
-	linkProgressEventOf(blend);
-	blend->SetOpacity(0, opacity);
+		if (!ok1)
+			return;
+		//	initialiseWindowTraversal();
+		if (is8BitImage()) //follow up images expected to be a label
+		{
+			colourMapToHSV(0);
+			colourMapToHSV(1);
+		}
+		else
+		{
+			colourMapToGray(0);
+			colourMapToGray(1);
+		}
+		vtkSmartPointer<vtkImageMapToColors> filterColorsImage = vtkSmartPointer<vtkImageMapToColors>::New();
+		filterColorsImage->SetLookupTable(GetLookupTable(0));
 #if VTK_MAJOR_VERSION <= 5
-	blend->AddInput(ucharData1);
+		filterColorsImage->SetInput(imageData[0]);
 #else
-	blend->AddInputData(ucharData1);
+		filterColorsImage->SetInputData(imageData[0]);
 #endif
-	//        blend->SetBlendModeToCompound();
-	blend->SetBlendModeToNormal();
-	vtkSmartPointer<vtkImageMapToColors> filterColorsOverlay = vtkSmartPointer<vtkImageMapToColors>::New();
+		filterColorsImage->PassAlphaToOutputOn();
+		filterColorsImage->Update();
+		vtkSmartPointer<vtkImageData> ucharData1 = filterColorsImage->GetOutput();
+
+		int initialExtent[6];
+		imageData[0]->GetExtent(initialExtent);
+
+		// Combine the images (blend takes multiple connections on the 0th input port)
+		emit working(-1);
+		vtkSmartPointer<vtkImageBlend> blend = vtkSmartPointer<vtkImageBlend>::New();
+		linkProgressEventOf(blend);
+		blend->SetOpacity(0, opacity);
+#if VTK_MAJOR_VERSION <= 5
+		blend->AddInput(ucharData1);
+#else
+		blend->AddInputData(ucharData1);
+#endif
+		//        blend->SetBlendModeToCompound();
+		blend->SetBlendModeToNormal();
+		vtkSmartPointer<vtkImageMapToColors> filterColorsOverlay = vtkSmartPointer<vtkImageMapToColors>::New();
 		filterColorsOverlay->SetLookupTable(GetLookupTable(1));
 #if VTK_MAJOR_VERSION <= 5
-	filterColorsOverlay->SetInput(imageData[1]);
+		filterColorsOverlay->SetInput(imageData[1]);
 #else
 		filterColorsOverlay->SetInputData(imageData[1]);
 #endif
@@ -743,19 +772,20 @@ void milxQtImage::blend()
 			blend->AddInputData(ucharData2);
 #endif
 			blend->SetOpacity(1, opacity);
-		}
+	}
 		else
 			printError("Images are not the same size. Skipping.");
-	
 
-	printInfo("Blending");
-	blend->Update();
-	printDebug("Number of components: " + QString::number(blend->GetOutput()->GetNumberOfScalarComponents()));
-	emit done(-1);
-	setData(blend->GetOutput(),2);
-	generate(2);
-	radio3->setDisabled(false);
-	radio3->setChecked(true);
+
+		printInfo("Blending");
+		blend->Update();
+		printDebug("Number of components: " + QString::number(blend->GetOutput()->GetNumberOfScalarComponents()));
+		emit done(-1);
+		setData(blend->GetOutput(), 2);
+		generate(2);
+		radio3->setDisabled(false);
+		radio3->setChecked(true);
+}
 }
 
 void milxQtImage::refresh()
@@ -975,18 +1005,7 @@ void milxQtImage::writeSettings(QWidget *parent)
 	settings.beginGroup("milxQtImage");
 	QMainWindow *mainWindow = qobject_cast<QMainWindow *>(parent);
 	settings.setValue("windowState", mainWindow->saveState());	
-	if (currentView[0] == AXIAL)
-	{
-		settings.setValue("ImageView" , 0);
-	}
-	else if (currentView[0] == CORONAL)
-	{
-		settings.setValue("ImageView" , 1);
-	}
-	else if (currentView[0] == SAGITTAL)
-	{
-		settings.setValue("ImageView" , 2);
-	}
+	settings.setValue("ImageView" , index);
 	settings.endGroup();
 	printDebug("saveSetting");
 }
@@ -1007,6 +1026,62 @@ void milxQtImage::readSettings(QMainWindow *parent)
 	printDebug("ReadSettings");
 	//use value in view to set view in viewer
 }
+
+void milxQtImage::dragEnterEvent(QDragEnterEvent *currentEvent)
+{
+	if (currentEvent->mimeData()->hasFormat("text/uri-list") || currentEvent->mimeData()->hasFormat("text/plain"))
+		currentEvent->acceptProposedAction();
+}
+
+void milxQtImage::dropEvent(QDropEvent *currentEvent)
+{
+
+	QList<QUrl> urlsList = currentEvent->mimeData()->urls();
+	QString tmp;
+
+	for (int j = 0; j < urlsList.size(); j++)
+	{
+		printInfo("j");
+		if (urlsList[j].isValid())
+		{
+			count = count + 1;
+#ifdef Q_WS_WIN
+			tmp = urlsList[j].path().remove(0, 1); //!< Remove leading forward slash
+#else
+			tmp = urlsList[j].path().remove(0, 1);
+			printInfo(tmp);
+#endif
+			typedef itk::Image<float, 3> VisualizingImageType;
+			VisualizingImageType::Pointer imageType = VisualizingImageType::New();
+			;
+			if (!milx::File::OpenImage<VisualizingImageType>(tmp.toStdString(), imageType))
+			{
+				milx::PrintError("Could not open file.");
+
+			}
+			vtkSmartPointer<vtkImageData> imageVTK = milx::Image<VisualizingImageType>::ConvertITKImageToVTKImage(imageType);
+			vtkSmartPointer<vtkMatrix4x4> matrix = vtkSmartPointer<vtkMatrix4x4>::New();
+			vtkSmartPointer<vtkImageData> imageVTKOrientation = milx::Image<VisualizingImageType>::ApplyOrientationToVTKImage(imageVTK, imageType, matrix, true);
+			setData(imageVTKOrientation, count);
+			generate(count);
+			if (count == 0)
+			{
+				radio1->setChecked(true);
+
+			}
+			if (count == 1)
+			{
+				radio2->setDisabled(false);
+				radio2->setChecked(true);
+				blend();
+
+			}
+		}
+	}
+
+	currentEvent->acceptProposedAction();
+}
+
 
 void milxQtImage::createConnections()
 {
