@@ -170,6 +170,11 @@ public slots:
 	void close(QWidget *parent);
 	void writeSettings(QWidget *parent);
 	void readSettings(QMainWindow *parent);
+	/*!
+	\fn milxQtMain::controls()
+	\brief Show the controls information.
+	*/
+	void controls();
 
 protected:
 	Ui_MainWindow ui;
@@ -181,6 +186,7 @@ protected:
 	QPushButton *expand;
 	int index;//orientation
 	int count = -1;
+	int toolbarStatus;
 	QLabel *cor;
 	vtkSmartPointer<vtkImageAccumulate> hist; //!< Histogram filter, allocated on histogram() call
 	bool track; //!< track the coordinates during user interaction

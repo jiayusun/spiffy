@@ -34,6 +34,7 @@
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QSplashScreen>
 #include <vtkImageMapToWindowLevelColors.h>
 #include <vtkImageMapToColors.h>
 #include "vtkImageViewer3.h"
@@ -133,7 +134,7 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	ui.toolBar->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint);
 	ui.toolBar->setFixedHeight(654);
 	ui.toolBar->adjustSize();
-	ui.toolBar->hide();
+	ui.toolBar->show();
 	actionToolbar = ui.toolBar->toggleViewAction();
 	ui.statusbar->setFixedHeight(48);
 	expand = new QPushButton();
@@ -141,9 +142,13 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	expand->setFixedHeight(40);
 	expand->setIcon(QIcon(":/resources/toolbar/expand.png"));
 	ui.statusbar->addWidget(expand);
+	readSettings(mainWindow);
+	if (toolbarStatus == 0)
+	{
+		ui.toolBar->hide();
+	}
 	cor = new QLabel("");
 	ui.statusbar->addPermanentWidget(cor);
-	readSettings(mainWindow);
 	createConnections();
 	QSignalMapper* mapper = new QSignalMapper;
 	mapper->setMapping(ui.actionExit, mainWindow);
@@ -1003,8 +1008,15 @@ void milxQtImage::writeSettings(QWidget *parent)
 {
 	QSettings settings("Shekhar Chandra", "milxQt");
 	settings.beginGroup("milxQtImage");
-	QMainWindow *mainWindow = qobject_cast<QMainWindow *>(parent);
-	settings.setValue("windowState", mainWindow->saveState());	
+	if (ui.toolBar->isHidden() == true)
+	{
+		settings.setValue("toolbar", 0);
+	}
+	else
+	{
+		settings.setValue("toolbar", 1);
+	}
+
 	settings.setValue("ImageView" , index);
 	settings.endGroup();
 	printDebug("saveSetting");
@@ -1015,7 +1027,7 @@ void milxQtImage::readSettings(QMainWindow *parent)
 	QSettings settings("Shekhar Chandra", "milxQt");
 
 	settings.beginGroup("milxQtImage");
-	parent->restoreState(settings.value("windowState").toByteArray());
+	toolbarStatus = settings.value("toolbar",0).toInt();
 
 	index = settings.value("ImageView",defaultView).toInt();
 	
@@ -1082,6 +1094,18 @@ void milxQtImage::dropEvent(QDropEvent *currentEvent)
 	currentEvent->acceptProposedAction();
 }
 
+void milxQtImage::controls()
+{
+	printDebug("Showing controls available...");
+	QPixmap pixmap(":resources/controls_splash.png");
+	QSplashScreen *controlsSplash = new QSplashScreen(this);
+	controlsSplash->setPixmap(pixmap);
+	controlsSplash->setMask(pixmap.mask());
+	controlsSplash->show();
+
+	qApp->processEvents();
+}
+
 
 void milxQtImage::createConnections()
 {
@@ -1094,6 +1118,7 @@ void milxQtImage::createConnections()
 	QObject::connect(ui.actionCoronal, SIGNAL(triggered()), this, SLOT(viewToZXPlane()));
 	QObject::connect(ui.actionSagittal, SIGNAL(triggered()), this, SLOT(viewToZYPlane()));
 	QObject::connect(ui.actionAbout_2, SIGNAL(triggered()), this, SLOT(about()));
+	QObject::connect(ui.actionControl_2, SIGNAL(triggered()), this, SLOT(controls()));
 	QSignalMapper* mapper = new QSignalMapper;
 	mapper->setMapping(ui.actionOpen_2, 0);
 	mapper->setMapping(ui.actionOpen, 1);
@@ -1104,6 +1129,7 @@ void milxQtImage::createConnections()
 	QObject::connect(ui.actionOpen, SIGNAL(triggered()), mapper, SLOT(map()));
 	QObject::connect(mapper, SIGNAL(mapped(int)), this, SLOT(open(int)));
 	QObject::connect(expand, SIGNAL(clicked()), actionToolbar, SLOT(trigger()));
+
 
 }
 

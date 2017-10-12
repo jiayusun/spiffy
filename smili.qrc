@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>resources/spiffy_splash.png</file>
+		<file>resources/spiffy.png</file>
         <file>resources/spiffy_icon.png</file>
         <file>resources/controls_splash.png</file>
         <file>resources/toolbar/open.png</file>
