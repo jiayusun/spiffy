@@ -77,6 +77,7 @@ public:
 	{
 		return eightbit;
 	}
+
 	/*!
 	\fn milxQtMain::dragEnterEvent(QDragEnterEvent *event)
 	\brief Part of the Drag and Drop feature members. Tells what drags to accept.
@@ -175,6 +176,30 @@ public slots:
 	\brief Show the controls information.
 	*/
 	void controls();
+	/*!
+	\fn milxQtImage::setSlice(int slice)
+	\brief Sets the slice of the volume to slice value given.
+
+	Bounds is checked.
+	*/
+	void setSlice(int slice, int i);
+	/*!
+	\fn milxQtImage::getSlice()
+	\brief Gets the current slice of the volume.
+	*/
+	int getSlice(int i);
+	/*!
+	\fn milxQtImage::setCrosshairPosition(double *position)
+	\brief Set the position of the Crosshair
+	*/
+	void setCrosshairPosition(double *position,int i);
+
+	/*!
+	\fn milxQtImage::getCrosshairPosition(double *position)
+	\brief Get the position of the Crosshair
+	*/
+	double* getCrosshairPosition(int i);
+
 
 protected:
 	Ui_MainWindow ui;
@@ -186,6 +211,7 @@ protected:
 	QPushButton *expand;
 	int index;//orientation
 	int count = -1;
+	int currentSlice;
 	int toolbarStatus;
 	QLabel *cor;
 	vtkSmartPointer<vtkImageAccumulate> hist; //!< Histogram filter, allocated on histogram() call

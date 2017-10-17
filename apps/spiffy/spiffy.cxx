@@ -52,7 +52,6 @@ int main(int argc, char *argv[])
 	if (argc < 2)
 	{
 		cerr << "View an image with correct orientation." << endl;
-		cerr << "Usage: " << argv[0] << " <image>" << endl;
 		milxQtImage *image = new milxQtImage(mainWindow);
 		mainWindow->setWindowTitle("SPIFFY");
 		mainWindow->show();

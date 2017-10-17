@@ -91,7 +91,6 @@
     <addaction name="actionAxial"/>
     <addaction name="actionCoronal"/>
     <addaction name="actionSagittal"/>
-    <addaction name="separator"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>

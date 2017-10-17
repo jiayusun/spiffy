@@ -71,7 +71,6 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	volume = false;
 	flipped = true;
 	actualNumberOfDimensions = 3;
-
 	QMainWindow *mainWindow = qobject_cast<QMainWindow *>(theParent);
 	mainWindow->installEventFilter(this);
 	mainWindow->setAcceptDrops(true);
@@ -154,7 +153,6 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	mapper->setMapping(ui.actionExit, mainWindow);
 	QObject::connect(ui.actionExit, SIGNAL(triggered()), mapper, SLOT(map()));
 	QObject::connect(mapper, SIGNAL(mapped(QWidget*)), this, SLOT(close(QWidget*)));
-
 }
 
 bool milxQtImage::eventFilter(QObject* obj, QEvent* ev){
@@ -162,7 +160,6 @@ bool milxQtImage::eventFilter(QObject* obj, QEvent* ev){
 	if (ev->type() == QEvent::DragEnter){
 		//you can compare widget against the stack of widgets you have
 		QDragEnterEvent *k = (QDragEnterEvent *)ev;
-		printInfo("de");
 		//if you want to stop widget from receiving the event you can return true
 		dragEnterEvent(k);
 		return true;
@@ -170,12 +167,45 @@ bool milxQtImage::eventFilter(QObject* obj, QEvent* ev){
 	if (ev->type() == QEvent::Drop){
 		//you can compare widget against the stack of widgets you have
 		QDropEvent *kd = (QDropEvent *)ev;
-		printInfo("drop");
 		//if you want to stop widget from receiving the event you can return true
 		dropEvent(kd);
 		return true;
 	}
 	return false;
+}
+
+
+
+void milxQtImage::setCrosshairPosition(double *position,int i)
+{
+	viewer[i]->SetCursorFocalPoint(position);
+	viewer[i]->UpdateCursor();
+}
+/*!
+\fn milxQtImage::getCrosshairPosition(double *position)
+\brief Get the position of the Crosshair
+*/
+double* milxQtImage::getCrosshairPosition(int i)
+{
+	return viewer[i]->GetCursorFocalPoint();
+}
+
+
+
+void milxQtImage::setSlice(int slice,int i)
+{
+	if (!loaded || !volume)
+		return;
+
+	if (slice >= viewer[currentViewer]->GetSliceMin() && slice <= viewer[currentViewer]->GetSliceMax())
+		viewer[i]->SetSlice(slice);
+	else
+		printError("Slice out of range! Ignoring.");
+}
+
+int milxQtImage::getSlice(int i)
+{
+	return viewer[i]->GetSlice();
 }
 
 milxQtImage::~milxQtImage()
@@ -197,7 +227,14 @@ void milxQtImage::setData(vtkSmartPointer<vtkImageData> newImg,int i)
 	vectorised = false;
 	flipped = false;
 	///Setup Connections
-
+	updateData(true);
+	imageData[i]->GetExtent(bounds);
+	if (bounds[5] > 1)
+		volume = true;
+	if (volume == true)
+		printInfo("volume" + QString::number(bounds[5]));
+	if (i==0)
+	currentSlice = bounds[5] / 2;
 	//~ histogram(256, 0, 255, false);
 }
 
@@ -206,12 +243,7 @@ void milxQtImage::generate(int i, const bool quietly)
 	setConsole(console);
 	currentViewer = i;
 	emit working(-1);
-	updateData(true);
-	imageData[i]->GetExtent(bounds);
-	if (bounds[5] > 1)
-		volume = true;
-	if (volume == true)
-		printInfo("volume" + QString::number(bounds[5]));
+
 	// Visualize
 	viewer[i]->SetInputData(imageData[i]);
 	//imageViewer->GetRenderWindow()->SetSize(500, 500);
@@ -222,7 +254,7 @@ void milxQtImage::generate(int i, const bool quietly)
 	viewer[i]->SetupInteractor(ui.qvtkWidget->GetRenderWindow()->GetInteractor());
 	SetupWidgets(viewer[i]->GetRenderWindow()->GetInteractor());
 	if (volume)
-		viewer[i]->SetSlice(bounds[5] / 2); //show middle of volume
+		viewer[i]->SetSlice(currentSlice); //show middle of volumeviewer[currentViewer]->SetSlice(bounds[5] / 2);
 	
 	viewer[i]->GetInteractorStyle()->InvokeEvent(vtkCommand::ResetWindowLevelEvent);
 	viewer[i]->GetRenderer()->ResetCamera();
@@ -266,12 +298,12 @@ printDebug("Completed Generating Image");
 
 void milxQtImage::viewToXYPlane()
 {
+	currentSlice = getSlice(currentViewer);
 	setConsole(console);
 	if (ui.actionAxial->isChecked())
 	{
 		viewer[currentViewer]->SetSliceOrientationToXY();
-		if (volume)
-			viewer[currentViewer]->SetSlice(bounds[5] / 2); //show middle of volume
+		viewer[currentViewer]->SetSlice(currentSlice); //show middle 
 		index = 0;
 		ui.actionAxial->setChecked(true);
 		ui.actionCoronal->setChecked(false);
@@ -285,11 +317,11 @@ void milxQtImage::viewToXYPlane()
 void milxQtImage::viewToZXPlane()
 {
 	setConsole(console);
+	currentSlice = getSlice(currentViewer);
 	if (ui.actionCoronal->isChecked())
 	{
 		viewer[currentViewer]->SetSliceOrientationToXZ();
-		if (volume)
-			viewer[currentViewer]->SetSlice(bounds[5] / 2); //show middle of volume
+		viewer[currentViewer]->SetSlice(currentSlice); //show middle 
 		index = 1;
 		ui.actionAxial->setChecked(false);
 		ui.actionCoronal->setChecked(true);
@@ -300,11 +332,11 @@ void milxQtImage::viewToZXPlane()
 void milxQtImage::viewToZYPlane()
 {
 	setConsole(console);
+	currentSlice = getSlice(currentViewer);
 	if (ui.actionSagittal->isChecked())
 	{
 		viewer[currentViewer]->SetSliceOrientationToYZ();
-		if (volume)
-			viewer[currentViewer]->SetSlice(bounds[5] / 2); //show middle of volume
+		viewer[currentViewer]->SetSlice(currentSlice); //show middle 
 		index = 2;
 		ui.actionSagittal->setChecked(true);
 		ui.actionAxial->setChecked(false);
@@ -451,6 +483,7 @@ void milxQtImage::open(int i)
 void milxQtImage::switchViewer()
 {
 	setConsole(console);
+	currentSlice = getSlice(currentViewer);
 	generate(radioButtonGroup->checkedId());
 }
 
@@ -972,6 +1005,7 @@ void milxQtImage::updateCoords(vtkObject *obj)
 {
 	///Get interactor
 	vtkRenderWindowInteractor* iren = vtkRenderWindowInteractor::SafeDownCast(obj);
+	vtkImageData* pImageData = viewer[currentViewer]->GetInput();
 	QString message = "";
 
 	///Get event position
@@ -988,8 +1022,44 @@ void milxQtImage::updateCoords(vtkObject *obj)
 		dataPicker->GetPickPosition(point);
 
 		// Get the volume index within the entire volume now.
-		vtkIdType nVolIdx = dataPicker->GetPointId();
-		message = "Point " + QString::number(nVolIdx) + ": (" + QString::number(point[0]) + ", " + QString::number(point[1]) + ", " + QString::number(point[2]) + ")";
+		//vtkIdType nVolIdx = dataPicker->GetPointId();
+
+		double ptMapped[3];
+		dataPicker->GetMapperPosition(ptMapped);
+		coordinate current(ptMapped), cell(0.0); ///Get the pixel in real space
+		const int zAxis = viewer[currentViewer]->GetSliceOrientation();
+		int actual[3], relative[3];
+		double spacing[3], origin[3];
+
+		//~ printDebug("Prev. Current: " + QString::number(current[0]) + ", " + QString::number(current[1]) + ", " + QString::number(current[2]));
+		pImageData->GetSpacing(spacing);
+		pImageData->GetOrigin(origin);
+
+		//pick is always only 2D, add ``z-axis''
+		if (zAxis == vtkImageViewer2::SLICE_ORIENTATION_XY) //z-axis is z-axis
+		{
+			current[2] = origin[2] + viewer[currentViewer]->GetSlice()*spacing[2];
+			//~ printDebug("Axial");
+		}
+		else if (zAxis == vtkImageViewer2::SLICE_ORIENTATION_XZ) //y-axis is z-axis
+		{
+			//~ current[2] = current[1];
+			current[1] = origin[1] + viewer[currentViewer]->GetSlice()*spacing[1];
+			//~ printDebug("Coronal");
+		}
+		else if (zAxis == vtkImageViewer2::SLICE_ORIENTATION_YZ) //x-axis is z-axis
+		{
+			//~ current[2] = current[1];
+			//~ current[1] = current[0];
+			current[0] = origin[0] + viewer[currentViewer]->GetSlice()*spacing[0];
+			//~ printDebug("Sagittal");
+		}
+		///Compute the actual coordinate for pixel access
+		int nVolIdx = pImageData->FindPoint(current.data_block());
+		const bool isInside = pImageData->ComputeStructuredCoordinates(current.data_block(), actual, cell.data_block());
+		const double scalar = pImageData->GetScalarComponentAsDouble(actual[0], actual[1], actual[2], 0); //Negative cause image flipped so use origin
+		message = "Point " + QString::number(nVolIdx) + ", Indices(" + QString::number(point[0]) + ", " + QString::number(point[1]) + ", " + QString::number(point[2]) + "), " + "Real(" + QString::number(current[0]) + ", " + QString::number(current[1]) + ", " + QString::number(current[2]) + ") = "
+			+ QString::number(scalar);;
 		
 	}
 
@@ -1053,7 +1123,6 @@ void milxQtImage::dropEvent(QDropEvent *currentEvent)
 
 	for (int j = 0; j < urlsList.size(); j++)
 	{
-		printInfo("j");
 		if (urlsList[j].isValid())
 		{
 			count = count + 1;
@@ -1129,7 +1198,6 @@ void milxQtImage::createConnections()
 	QObject::connect(ui.actionOpen, SIGNAL(triggered()), mapper, SLOT(map()));
 	QObject::connect(mapper, SIGNAL(mapped(int)), this, SLOT(open(int)));
 	QObject::connect(expand, SIGNAL(clicked()), actionToolbar, SLOT(trigger()));
-
 
 }
 
