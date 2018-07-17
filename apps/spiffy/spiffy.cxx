@@ -44,7 +44,6 @@ int main(int argc, char *argv[])
 	QPixmap pixmap(":resources/spiffy_splash.png");
 	QSplashScreen splash(pixmap);
 	//        splash.setMask(pixmap.mask());
-	splash.showMessage("This software is for research purposes only and is NOT approved for clinical use", Qt::AlignBottom | Qt::AlignHCenter);
 	splash.show();
 	app.processEvents();
 	
@@ -60,9 +59,9 @@ int main(int argc, char *argv[])
 		QObject::connect(&app, SIGNAL(aboutToQuit()), mapper, SLOT(map()));
 		QObject::connect(mapper, SIGNAL(mapped(QWidget*)), image, SLOT(writeSettings(QWidget*)));
 		splash.finish(mainWindow);
-		milx::PrintDebug("Generate image done.");
+		milx::PrintDebug("setup done.");
 	}
-	else
+	if (argc == 2)
 	{
 		std::string fileName = argv[1];
 
@@ -75,17 +74,17 @@ int main(int argc, char *argv[])
 		milxQtImage *image = new milxQtImage(mainWindow);
 		image->setData(imageVTK, 0);
 		image->generate(0);
-
+		milx::PrintDebug("Generate image done.");
 		mainWindow->setWindowTitle("SPIFFY");
 		mainWindow->show();
-		QSignalMapper *mapper = new QSignalMapper;
-		mapper->setMapping(&app, mainWindow);
-		QObject::connect(&app, SIGNAL(aboutToQuit()), mapper, SLOT(map()));
-		QObject::connect(mapper, SIGNAL(mapped(QWidget*)), image, SLOT(writeSettings(QWidget*)));
+//		QSignalMapper *mapper = new QSignalMapper;
+//		mapper->setMapping(&app, mainWindow);
+//		QObject::connect(&app, SIGNAL(aboutToQuit()), mapper, SLOT(map()));
+//		QObject::connect(mapper, SIGNAL(mapped(QWidget*)), image, SLOT(writeSettings(QWidget*)));
 		splash.finish(mainWindow);
-		milx::PrintDebug("Generate image done.");
+
 	}
-	
+
 	return app.exec();
 }
 

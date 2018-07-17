@@ -210,7 +210,6 @@ protected:
 	int currentView[3]; //!< Current view for data
 	QPushButton *expand;
 	int index;//orientation
-	int count = -1;
 	int currentSlice;
 	int toolbarStatus;
 	QLabel *cor;

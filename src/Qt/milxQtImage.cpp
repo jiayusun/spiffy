@@ -15,8 +15,6 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 =========================================================================*/
-//ITK
-//#include <itkImageToHistogramFilter.h>
 //VTK Libraries
 #include "milxQtImage.h"
 #include "milxFile.h"
@@ -86,7 +84,6 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 		imageData[j] = vtkSmartPointer<vtkImageData>::New();
 	}
 	openSupport = extensionsOpen.c_str();
-	milx::PrintDebug("constructor");
 //	ui.pushButton_10->setChecked(false);
 	QPoint pos = mainWindow->mapToGlobal(QPoint(0, 0));
 	mainWindow->move(pos.x() + 300, pos.y() + 30);
@@ -141,7 +138,7 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	expand->setFixedHeight(40);
 	expand->setIcon(QIcon(":/resources/toolbar/expand.png"));
 	ui.statusbar->addWidget(expand);
-	readSettings(mainWindow);
+//	readSettings(mainWindow);
 	if (toolbarStatus == 0)
 	{
 		ui.toolBar->hide();
@@ -153,6 +150,12 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	mapper->setMapping(ui.actionExit, mainWindow);
 	QObject::connect(ui.actionExit, SIGNAL(triggered()), mapper, SLOT(map()));
 	QObject::connect(mapper, SIGNAL(mapped(QWidget*)), this, SLOT(close(QWidget*)));
+	milx::PrintDebug("constructor");
+}
+
+milxQtImage::~milxQtImage()
+{
+	///Smart pointers handle deletion
 }
 
 bool milxQtImage::eventFilter(QObject* obj, QEvent* ev){
@@ -208,13 +211,10 @@ int milxQtImage::getSlice(int i)
 	return viewer[i]->GetSlice();
 }
 
-milxQtImage::~milxQtImage()
-{
-    ///Smart pointers handle deletion
-}
 
 void milxQtImage::setData(vtkSmartPointer<vtkImageData> newImg,int i)
 {
+	printDebug("setdata start");
 	setConsole(console);
 	imageData[i]->DeepCopy(newImg);
 	usingVTKImage = true;
@@ -1125,7 +1125,7 @@ void milxQtImage::dropEvent(QDropEvent *currentEvent)
 	{
 		if (urlsList[j].isValid())
 		{
-			count = count + 1;
+
 #ifdef Q_WS_WIN
 			tmp = urlsList[j].path().remove(0, 1); //!< Remove leading forward slash
 #else
@@ -1134,23 +1134,24 @@ void milxQtImage::dropEvent(QDropEvent *currentEvent)
 #endif
 			typedef itk::Image<float, 3> VisualizingImageType;
 			VisualizingImageType::Pointer imageType = VisualizingImageType::New();
-			;
 			if (!milx::File::OpenImage<VisualizingImageType>(tmp.toStdString(), imageType))
 			{
 				milx::PrintError("Could not open file.");
 
 			}
+			QString s = QString::number(j);
+			printInfo(s);
 			vtkSmartPointer<vtkImageData> imageVTK = milx::Image<VisualizingImageType>::ConvertITKImageToVTKImage(imageType);
 			vtkSmartPointer<vtkMatrix4x4> matrix = vtkSmartPointer<vtkMatrix4x4>::New();
 			vtkSmartPointer<vtkImageData> imageVTKOrientation = milx::Image<VisualizingImageType>::ApplyOrientationToVTKImage(imageVTK, imageType, matrix, true);
-			setData(imageVTKOrientation, count);
-			generate(count);
-			if (count == 0)
+			setData(imageVTKOrientation, j);
+			generate(j);
+			if (j == 0)
 			{
 				radio1->setChecked(true);
 
 			}
-			if (count == 1)
+			if (j == 1)
 			{
 				radio2->setDisabled(false);
 				radio2->setChecked(true);
