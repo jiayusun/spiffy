@@ -88,7 +88,7 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	QPoint pos = mainWindow->mapToGlobal(QPoint(0, 0));
 	mainWindow->move(pos.x() + 300, pos.y() + 30);
 //	mainWindow->resize(611, 654);
-	mainWindow->setFixedSize(611, 611);
+	mainWindow->setFixedSize(650, 611);
 	mainWindow->setWindowFlags((windowFlags() | Qt::CustomizeWindowHint) & ~Qt::WindowMaximizeButtonHint);//remove maximize button and resize handles from window?
 	orientationGroup = new QActionGroup(ui.toolBar);
 	orientationGroup->addAction(ui.actionAxial);
@@ -138,8 +138,12 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	expand->setFixedHeight(40);
 	expand->setIcon(QIcon(":/resources/toolbar/expand.png"));
 	ui.statusbar->addWidget(expand);
-//	readSettings(mainWindow);
-	if (toolbarStatus == 0)
+	readSettings(mainWindow);
+	if (toolbarStatus == 1)
+	{
+		ui.toolBar->show();
+	}
+	else
 	{
 		ui.toolBar->hide();
 	}
@@ -150,7 +154,7 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	mapper->setMapping(ui.actionExit, mainWindow);
 	QObject::connect(ui.actionExit, SIGNAL(triggered()), mapper, SLOT(map()));
 	QObject::connect(mapper, SIGNAL(mapped(QWidget*)), this, SLOT(close(QWidget*)));
-	milx::PrintDebug("constructor");
+//	milx::PrintDebug("constructor");
 }
 
 milxQtImage::~milxQtImage()
@@ -179,15 +183,14 @@ bool milxQtImage::eventFilter(QObject* obj, QEvent* ev){
 
 
 
+
+
 void milxQtImage::setCrosshairPosition(double *position)
 {
 	viewer[currentViewer]->SetCursorFocalPoint(position);
 	viewer[currentViewer]->UpdateCursor();
 }
-/*!
-\fn milxQtImage::getCrosshairPosition(double *position)
-\brief Get the position of the Crosshair
-*/
+
 double* milxQtImage::getCrosshairPosition()
 {
 	return viewer[currentViewer]->GetCursorFocalPoint();
@@ -241,6 +244,11 @@ void milxQtImage::setData(vtkSmartPointer<vtkImageData> newImg,int i)
 void milxQtImage::generate(int i, const bool quietly)
 {
 	setConsole(console);
+	if (ui.actionCrosshair->isChecked())
+	{
+		viewer[currentViewer]->DisableCursor();
+		ui.actionCrosshair->setChecked(false);
+	}
 	currentViewer = i;
 	emit working(-1);
 
@@ -795,6 +803,7 @@ void milxQtImage::updateLookupTable(int i)
 void milxQtImage::blend()
 {
 	setConsole(console);
+
 	if (viewer[1]->GetInput() == NULL)
 	{
 		printInfo("You need set label Image");
@@ -1205,18 +1214,50 @@ void milxQtImage::dropEvent(QDropEvent *currentEvent)
 			vtkSmartPointer<vtkImageData> imageVTK = milx::Image<VisualizingImageType>::ConvertITKImageToVTKImage(imageType);
 			vtkSmartPointer<vtkMatrix4x4> matrix = vtkSmartPointer<vtkMatrix4x4>::New();
 			vtkSmartPointer<vtkImageData> imageVTKOrientation = milx::Image<VisualizingImageType>::ApplyOrientationToVTKImage(imageVTK, imageType, matrix, true);
-			setData(imageVTKOrientation, j);
-			generate(j);
+
 			if (j == 0)
 			{
-				radio1->setChecked(true);
-
+				
+				QMessageBox msgBox;
+				msgBox.setText("Choose medical image or its label image");
+				QPushButton *bIm = msgBox.addButton(tr("Image"), QMessageBox::ActionRole);
+				QPushButton *bLa = msgBox.addButton(tr("Label Image"), QMessageBox::ActionRole);
+//				QPushButton *two = msgBox.addButton(tr("Both Images"), QMessageBox::ActionRole);
+				int ret = msgBox.exec();
+				if (msgBox.clickedButton() == bIm) {
+					setData(imageVTKOrientation, 0);
+					generate(0);
+					radio1->setDisabled(false);
+					radio1->setChecked(true);
+				}
+				else if (msgBox.clickedButton() == bLa) {
+					setData(imageVTKOrientation, 1);
+					generate(1);
+					radio2->setDisabled(false);
+					radio2->setChecked(true);
+				}
+				/*
+				else if (msgBox.clickedButton() == two) {
+					setData(imageVTKOrientation, 0);
+					generate(0);
+					radio1->setDisabled(false);
+					radio1->setChecked(true);
+					
+				}
+				*/
 			}
-			if (j == 1)
+			if (j > 0)
 			{
+				/*
+				setData(imageVTKOrientation, 1);
+				generate(1);
 				radio2->setDisabled(false);
 				radio2->setChecked(true);
 				blend();
+				if (radio3->isChecked() == true){
+				*/	
+				QMessageBox::information(NULL, tr("SPIFFY"), tr("Drag only one image each time!"));
+//				}
 
 			}
 		}

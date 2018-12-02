@@ -10,8 +10,7 @@ It has been developed with the combination of some powerful software libraries s
 It offers a quick view of medical images. SPIFFY also offers some essential manipulation on medical 
 images such as showing crosshair on the image, changing image intensity, changing slice orientation, 
 changing slices to display, blending the medical image with its label image, a dragging/dropping action of medical 
-image and its label image together into the main window to generate a blended image instead of loading and clicking 
-on the toolbar etc. This may provide a huge convenience for users, such as doctors and researchers, to analyze a 
+image and its label image. This may provide a huge convenience for users, such as doctors and researchers, to analyze a 
 specific part of the human body according to medical images. 
 The user interface of SPIFFY is an application of minimalist aesthetics. 
 

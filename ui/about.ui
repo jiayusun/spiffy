@@ -61,7 +61,7 @@ for Medical Imaging
     <item>
      <widget class="QLabel" name="lblAuthor">
       <property name="text">
-       <string>Dr.Shekhar Chandra and Jiayu Sun</string>
+       <string>SPIFFY is a master thesis project developed by Jiayu Sun under the supervision of Dr.Shekhar Chandra. </string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
