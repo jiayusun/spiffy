@@ -14,6 +14,8 @@ image and its label image. This may provide a huge convenience for users, such a
 specific part of the human body according to medical images. 
 The user interface of SPIFFY is an application of minimalist aesthetics. 
 
+![SPIFFY UI](resources/spiffy_ui.png)
+
 ##Copyright
 ---------
 
