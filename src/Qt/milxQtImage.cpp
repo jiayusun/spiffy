@@ -121,7 +121,7 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	radioButtonGroup->addButton(radio1, 0);
 	radioButtonGroup->addButton(radio2, 1);
 	radioButtonGroup->addButton(radio3, 2);
-	radio1->setChecked(true);
+	radio1->setDisabled(true);
 	radio2->setDisabled(true);
 	radio3->setDisabled(true);
 	ui.toolBar->setAllowedAreas(Qt::NoToolBarArea);
@@ -179,18 +179,18 @@ bool milxQtImage::eventFilter(QObject* obj, QEvent* ev){
 
 
 
-void milxQtImage::setCrosshairPosition(double *position,int i)
+void milxQtImage::setCrosshairPosition(double *position)
 {
-	viewer[i]->SetCursorFocalPoint(position);
-	viewer[i]->UpdateCursor();
+	viewer[currentViewer]->SetCursorFocalPoint(position);
+	viewer[currentViewer]->UpdateCursor();
 }
 /*!
 \fn milxQtImage::getCrosshairPosition(double *position)
 \brief Get the position of the Crosshair
 */
-double* milxQtImage::getCrosshairPosition(int i)
+double* milxQtImage::getCrosshairPosition()
 {
-	return viewer[i]->GetCursorFocalPoint();
+	return viewer[currentViewer]->GetCursorFocalPoint();
 }
 
 
@@ -300,14 +300,30 @@ void milxQtImage::viewToXYPlane()
 {
 	currentSlice = getSlice(currentViewer);
 	setConsole(console);
-	if (ui.actionAxial->isChecked())
+	if (ui.actionCrosshair->isChecked())
 	{
-		viewer[currentViewer]->SetSliceOrientationToXY();
-		viewer[currentViewer]->SetSlice(currentSlice); //show middle 
-		index = 0;
-		ui.actionAxial->setChecked(true);
-		ui.actionCoronal->setChecked(false);
-		ui.actionSagittal->setChecked(false);
+		viewer[currentViewer]->DisableCursor();
+		if (ui.actionAxial->isChecked())
+		{
+			viewer[currentViewer]->SetSliceOrientationToXY();
+			viewer[currentViewer]->SetSlice(currentSlice); //show middle
+			viewer[currentViewer]->EnableCursor();
+			index = 0;
+			ui.actionAxial->setChecked(true);
+			ui.actionCoronal->setChecked(false);
+			ui.actionSagittal->setChecked(false);
+		}
+	}
+	else{
+		if (ui.actionAxial->isChecked())
+		{
+			viewer[currentViewer]->SetSliceOrientationToXY();
+			viewer[currentViewer]->SetSlice(currentSlice); //show middle
+			index = 0;
+			ui.actionAxial->setChecked(true);
+			ui.actionCoronal->setChecked(false);
+			ui.actionSagittal->setChecked(false);
+		}
 	}
     
 }
@@ -318,14 +334,30 @@ void milxQtImage::viewToZXPlane()
 {
 	setConsole(console);
 	currentSlice = getSlice(currentViewer);
-	if (ui.actionCoronal->isChecked())
+	if (ui.actionCrosshair->isChecked())
 	{
-		viewer[currentViewer]->SetSliceOrientationToXZ();
-		viewer[currentViewer]->SetSlice(currentSlice); //show middle 
-		index = 1;
-		ui.actionAxial->setChecked(false);
-		ui.actionCoronal->setChecked(true);
-		ui.actionSagittal->setChecked(false);
+		viewer[currentViewer]->DisableCursor();
+		if (ui.actionCoronal->isChecked())
+		{
+			viewer[currentViewer]->SetSliceOrientationToXZ();
+			viewer[currentViewer]->SetSlice(currentSlice); //show middle
+			viewer[currentViewer]->EnableCursor();
+			index = 1;
+			ui.actionAxial->setChecked(false);
+			ui.actionCoronal->setChecked(true);
+			ui.actionSagittal->setChecked(false);
+		}
+	}
+	else{
+		if (ui.actionCoronal->isChecked())
+		{
+			viewer[currentViewer]->SetSliceOrientationToXZ();
+			viewer[currentViewer]->SetSlice(currentSlice); //show middle
+			index = 1;
+			ui.actionAxial->setChecked(false);
+			ui.actionCoronal->setChecked(true);
+			ui.actionSagittal->setChecked(false);
+		}
 	}
 }
 
@@ -333,14 +365,30 @@ void milxQtImage::viewToZYPlane()
 {
 	setConsole(console);
 	currentSlice = getSlice(currentViewer);
-	if (ui.actionSagittal->isChecked())
+	if (ui.actionCrosshair->isChecked())
 	{
-		viewer[currentViewer]->SetSliceOrientationToYZ();
-		viewer[currentViewer]->SetSlice(currentSlice); //show middle 
-		index = 2;
-		ui.actionSagittal->setChecked(true);
-		ui.actionAxial->setChecked(false);
-		ui.actionCoronal->setChecked(false);
+		viewer[currentViewer]->DisableCursor();
+		if (ui.actionSagittal->isChecked())
+		{
+			viewer[currentViewer]->SetSliceOrientationToYZ();
+			viewer[currentViewer]->SetSlice(currentSlice); //show middle
+			viewer[currentViewer]->EnableCursor();
+			index = 2;
+			ui.actionSagittal->setChecked(true);
+			ui.actionAxial->setChecked(false);
+			ui.actionCoronal->setChecked(false);
+		}
+	}
+	else{
+		if (ui.actionSagittal->isChecked())
+		{
+			viewer[currentViewer]->SetSliceOrientationToYZ();
+			viewer[currentViewer]->SetSlice(currentSlice); //show middle
+			index = 2;
+			ui.actionSagittal->setChecked(true);
+			ui.actionAxial->setChecked(false);
+			ui.actionCoronal->setChecked(false);
+		}
 	}
 		    
 }
@@ -352,13 +400,13 @@ void milxQtImage::updateWindowsWithCursors()
 	{
 		viewer[currentViewer]->EnableCursor();
 		ui.actionCrosshair->setChecked(true);
-		printInfo("enable cursor");
+		printDebug("enable cursor");
 	}
 	else
 	{
 		viewer[currentViewer]->DisableCursor();
 		ui.actionCrosshair->setChecked(false);
-		printInfo("disable cursor");
+		printDebug("disable cursor");
 	}
 }
 
@@ -369,6 +417,7 @@ void milxQtImage::autoLevel(float percentile)
 	setConsole(console);
 	if (currentViewer == 2){
 		printInfo("Can not do Auto-level display on blend image");
+		QMessageBox::information(NULL, tr("SPIFFY"), tr("Can not do Auto - level display on blend image"));
 	}
 	else{
 		printInfo("Auto Updating Window Level");
@@ -428,6 +477,7 @@ void milxQtImage::autoLevel(float percentile)
 		viewer[currentViewer]->SetColorWindow(windowLevel);
 		viewer[currentViewer]->SetColorLevel(level);
 		viewer[currentViewer]->Render();
+		setCrosshairPosition(getCrosshairPosition());
 	}
 }
 
@@ -461,21 +511,26 @@ void milxQtImage::open(int i)
 			milx::PrintError("Could not open file.");
 
 		}
-		vtkSmartPointer<vtkImageData> imageVTK = milx::Image<VisualizingImageType>::ConvertITKImageToVTKImage(imageType);
-		vtkSmartPointer<vtkMatrix4x4> matrix = vtkSmartPointer<vtkMatrix4x4>::New();
-		vtkSmartPointer<vtkImageData> imageVTKOrientation = milx::Image<VisualizingImageType>::ApplyOrientationToVTKImage(imageVTK, imageType, matrix, true);
-		setData(imageVTKOrientation,i);
-		generate(i);
-		if (i = 0)
-		{
-			radio1->setChecked(true);
+		else{
+			vtkSmartPointer<vtkImageData> imageVTK = milx::Image<VisualizingImageType>::ConvertITKImageToVTKImage(imageType);
+			vtkSmartPointer<vtkMatrix4x4> matrix = vtkSmartPointer<vtkMatrix4x4>::New();
+			vtkSmartPointer<vtkImageData> imageVTKOrientation = milx::Image<VisualizingImageType>::ApplyOrientationToVTKImage(imageVTK, imageType, matrix, true);
+			setData(imageVTKOrientation, i);
+			generate(i);
+			if (i == 0)
+			{
+				printDebug("Loading Original Image Data");
+				radio1->setDisabled(false);
+				radio1->setChecked(true);
 
-		}
-		if (i = 1)
-		{
-			radio2->setDisabled(false);
-			radio2->setChecked(true);
+			}
+			if (i == 1)
+			{
+				printDebug("Loading Label Image Data");
+				radio2->setDisabled(false);
+				radio2->setChecked(true);
 
+			}
 		}
 	}
 }
@@ -483,6 +538,12 @@ void milxQtImage::open(int i)
 void milxQtImage::switchViewer()
 {
 	setConsole(console);
+	if (ui.actionCrosshair->isChecked())
+	{
+		viewer[currentViewer]->DisableCursor();
+		ui.actionCrosshair->setChecked(false);
+
+	}
 	currentSlice = getSlice(currentViewer);
 	generate(radioButtonGroup->checkedId());
 }

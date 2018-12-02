@@ -192,13 +192,13 @@ public slots:
 	\fn milxQtImage::setCrosshairPosition(double *position)
 	\brief Set the position of the Crosshair
 	*/
-	void setCrosshairPosition(double *position,int i);
+	void setCrosshairPosition(double *position);
 
 	/*!
 	\fn milxQtImage::getCrosshairPosition(double *position)
 	\brief Get the position of the Crosshair
 	*/
-	double* getCrosshairPosition(int i);
+	double* getCrosshairPosition();
 
 
 protected:

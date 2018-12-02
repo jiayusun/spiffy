@@ -11,6 +11,8 @@
 #include "milxGlobal.h"
 #include <sstream>
 #include "ui_spiffy.h"
+#include<windows.h>
+#pragma comment( linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" ) 
 template<class TImage>
 vtkSmartPointer<vtkImageData> openImage(std::string fileName, itk::SmartPointer<TImage> &imageData)
 {
@@ -50,7 +52,7 @@ int main(int argc, char *argv[])
 	QMainWindow *mainWindow = new QMainWindow;
 	if (argc < 2)
 	{
-		cerr << "View an image with correct orientation." << endl;
+	//	cerr << "View an image with correct orientation." << endl;
 		milxQtImage *image = new milxQtImage(mainWindow);
 		mainWindow->setWindowTitle("SPIFFY");
 		mainWindow->show();
