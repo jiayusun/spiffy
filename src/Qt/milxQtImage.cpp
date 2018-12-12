@@ -26,6 +26,7 @@
 #include "ui_spiffy.h"
 #include <sstream>
 #include <QDockWidget>
+#include <QDesktopWidget>
 #include <QApplication>
 #include <QInputDialog>
 #include <QFile>
@@ -86,9 +87,15 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	openSupport = extensionsOpen.c_str();
 //	ui.pushButton_10->setChecked(false);
 	QPoint pos = mainWindow->mapToGlobal(QPoint(0, 0));
-	mainWindow->move(pos.x() + 300, pos.y() + 30);
-//	mainWindow->resize(611, 654);
-	mainWindow->setFixedSize(650, 611);
+	QSize desktopSize = qApp->desktop()->availableGeometry().size();
+	int newHeight = 4.0*desktopSize.height() / 5.0 + 0.5;
+	int newWidth = 650*newHeight/611;
+	int xOffset = (desktopSize.width() - newWidth) / 2.0;
+	int yOffset = (desktopSize.height() - newHeight) / 2.0;
+	mainWindow->setFixedSize(QSize(newWidth, newHeight));
+	mainWindow->move(QPoint(xOffset, yOffset));
+	//mainWindow->move(pos.x() + 300, pos.y() + 30);
+//	mainWindow->setFixedSize(650, 611);
 	mainWindow->setWindowFlags((windowFlags() | Qt::CustomizeWindowHint) & ~Qt::WindowMaximizeButtonHint);//remove maximize button and resize handles from window?
 	orientationGroup = new QActionGroup(ui.toolBar);
 	orientationGroup->addAction(ui.actionAxial);
@@ -126,9 +133,11 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	radio3->setDisabled(true);
 	ui.toolBar->setAllowedAreas(Qt::NoToolBarArea);
 	ui.toolBar->setOrientation(Qt::Vertical);
-	ui.toolBar->move(mainWindow->pos().x() - 127, mainWindow->pos().y()-3);
+	ui.toolBar->setFixedWidth(0.21*newHeight);
+	ui.toolBar->setFixedHeight(1.07*newHeight);
+	ui.toolBar->move(mainWindow->pos().x() - 0.21*newHeight, mainWindow->pos().y() - 3 *newHeight/611);
+	ui.qvtkWidget->resize(631 * newHeight / 611, 591 * newHeight / 611);
 	ui.toolBar->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint);
-	ui.toolBar->setFixedHeight(654);
 	ui.toolBar->adjustSize();
 	ui.toolBar->show();
 	actionToolbar = ui.toolBar->toggleViewAction();
