@@ -133,29 +133,27 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 	radio3->setDisabled(true);
 	ui.toolBar->setAllowedAreas(Qt::NoToolBarArea);
 	ui.toolBar->setOrientation(Qt::Vertical);
-	ui.toolBar->setFixedWidth(0.21*newHeight);
-	ui.toolBar->setFixedHeight(1.07*newHeight);
-	ui.toolBar->move(mainWindow->pos().x() - 0.21*newHeight, mainWindow->pos().y() - 3 *newHeight/611);
+	//ui.toolBar->setFixedWidth(127 * newHeight / 611);
+
+	//ui.toolBar->move(mainWindow->pos().x() - 127*newHeight/611, mainWindow->pos().y() - 3 *newHeight/611);
+	//
+
 	ui.qvtkWidget->resize(631 * newHeight / 611, 591 * newHeight / 611);
 	ui.toolBar->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint);
+
 	ui.toolBar->adjustSize();
+	int tbWidth = ui.toolBar->frameGeometry().width();
+	ui.toolBar->setFixedHeight(651*tbWidth/134);
+	ui.toolBar->move(mainWindow->pos().x() - tbWidth, mainWindow->pos().y() - 10 * newHeight / 611);
 	ui.toolBar->show();
 	actionToolbar = ui.toolBar->toggleViewAction();
-	ui.statusbar->setFixedHeight(48);
+	ui.statusbar->setFixedHeight(48 * newHeight / 611);
 	expand = new QPushButton();
-	expand->setFixedWidth(40);
-	expand->setFixedHeight(40);
+	expand->setFixedWidth(40 * newHeight / 611);
+	expand->setFixedHeight(40 * newHeight / 611);
 	expand->setIcon(QIcon(":/resources/toolbar/expand.png"));
 	ui.statusbar->addWidget(expand);
-	readSettings(mainWindow);
-	if (toolbarStatus == 1)
-	{
-		ui.toolBar->show();
-	}
-	else
-	{
-		ui.toolBar->hide();
-	}
+	ui.toolBar->hide();
 	cor = new QLabel("");
 	ui.statusbar->addPermanentWidget(cor);
 	createConnections();
@@ -1176,8 +1174,7 @@ void milxQtImage::readSettings(QMainWindow *parent)
 	QSettings settings("Shekhar Chandra", "milxQt");
 
 	settings.beginGroup("milxQtImage");
-	toolbarStatus = settings.value("toolbar",0).toInt();
-
+	toolbarStatus = settings.value("toolbar", 0).toInt();
 	index = settings.value("ImageView",defaultView).toInt();
 	
 
