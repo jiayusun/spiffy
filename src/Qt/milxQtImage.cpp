@@ -140,11 +140,11 @@ milxQtImage::milxQtImage(QWidget *theParent, bool contextSystem) : milxQtRenderW
 
 	ui.qvtkWidget->resize(631 * newHeight / 611, 591 * newHeight / 611);
 	ui.toolBar->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint);
-
 	ui.toolBar->adjustSize();
 	int tbWidth = ui.toolBar->frameGeometry().width();
-	ui.toolBar->setFixedHeight(651*tbWidth/134);
-	ui.toolBar->move(mainWindow->pos().x() - tbWidth, mainWindow->pos().y() - 10 * newHeight / 611);
+	//int tbHeight = ui.toolBar->frameGeometry().height();
+	ui.toolBar->setFixedHeight(9 * tbWidth/2);
+	ui.toolBar->move(mainWindow->pos().x() - tbWidth, mainWindow->pos().y());
 	ui.toolBar->show();
 	actionToolbar = ui.toolBar->toggleViewAction();
 	ui.statusbar->setFixedHeight(48 * newHeight / 611);
